@@ -31,56 +31,102 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class CopsAndRobbersV1 extends ApplicationAdapter {
 
-	private TiledMap map;
-	private OrthogonalTiledMapRenderer renderer;
-	private OrthographicCamera camera;
-	private Texture robberImg;
-	private SpriteBatch batch;
-	private Rectangle robber;
+    private TiledMap map;
+    private OrthogonalTiledMapRenderer renderer;
+    private OrthographicCamera camera;
+    private Texture robberImg;
+    private SpriteBatch batch;
+    private Rectangle robber;
+
+    private Pool<Rectangle> rectPool = new Pool<Rectangle>() {
+        @Override
+        protected Rectangle newObject() {
+            return new Rectangle();
+        }
+    };
+    private Array<Rectangle> tiles = new Array<Rectangle>();
 
 
-	@Override
-	public void create () {
-		map = new TmxMapLoader().load("BlackAndWhiteTiles.tmx");
-		renderer = new OrthogonalTiledMapRenderer(map, 2.75f);
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 800,480);
-		camera.update();
+    @Override
+    public void create() {
+        map = new TmxMapLoader().load("BlackAndWhiteTiles.tmx");
+        renderer = new OrthogonalTiledMapRenderer(map, 1f);
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, 320, 320);
+        camera.update();
 
-		robberImg = new Texture(Gdx.files.internal("walka.PNG"));
-		batch = new SpriteBatch();
-		robber = new Rectangle();
-		robber.x = 0;
-		robber.y = 0;
-		robber.width = 88;
-		robber.height = 88;
+        robberImg = new Texture(Gdx.files.internal("walka.PNG"));
 
-	}
+        batch = new SpriteBatch();
+        robber = new Rectangle();
+        robber.x = 0;
+        robber.y = 0;
+        robber.width = 32;
+        robber.height = 32;
 
-	@Override
-	public void render () {
-		ScreenUtils.clear(0, 0, 0.2f, 1);
-		renderer.setView(camera);
-		renderer.render();
-		camera.update();
-		batch.setProjectionMatrix(camera.combined);
-		batch.begin();
-		batch.draw(robberImg, robber.x, robber.y);
-		batch.end();
+    }
 
-		if(Gdx.input.isTouched()) {
-			Vector3 touchPos = new Vector3();
-			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-			camera.unproject(touchPos);
-			robber.x = touchPos.x - 88 / 2;
-			robber.y = touchPos.y - 88 / 2;
-		}
-	}
-	
-	@Override
-	public void dispose () {
-		robberImg.dispose();
-		batch.dispose();
+    @Override
+    public void render() {
+        ScreenUtils.clear(0, 0, 0.2f, 1);
 
-	}
+        renderer.setView(camera);
+        renderer.render();
+        camera.update();
+        batch.setProjectionMatrix(camera.combined);
+
+
+        if (Gdx.input.isTouched()) {
+            Vector3 touchPos = new Vector3();
+            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            camera.unproject(touchPos);
+            updaterobber(touchPos);
+
+        }
+        batch.begin();
+        batch.draw(robberImg, robber.x, robber.y, robber.width, robber.height);
+        batch.end();
+
+    }
+
+    private void updaterobber(Vector3 touchPos) {
+
+        Rectangle robberRect = rectPool.obtain();
+        int startX, startY, endX, endY;
+        startX = (int) (touchPos.x);
+        endX = (int) (touchPos.x + robber.width);
+        startY = (int) (touchPos.y);
+        endY = (int) (touchPos.y + robber.height);
+        getTiles(startX, startY, endX, endY, tiles);
+        if (tiles.size != 0) {
+            return;
+        }
+
+        robber.x = (float) (Math.floor(touchPos.x / robber.width) * robber.width);
+        robber.y = (float) (Math.floor(touchPos.y / robber.width) * robber.width);
+
+    }
+
+    private void getTiles(int startX, int startY, int endX, int endY, Array<Rectangle> tiles) {
+        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("walls");
+        rectPool.freeAll(tiles);
+        tiles.clear();
+        int i = (int) Math.floor(startX / robber.width);
+        int j = (int) Math.floor(startY / robber.height);
+
+        Cell cell = layer.getCell(i, j);
+        if (cell != null) {
+            Rectangle rect = rectPool.obtain();
+            rect.set(i, j, 1, 1);
+            tiles.add(rect);
+        }
+    }
+
+
+    @Override
+    public void dispose() {
+        robberImg.dispose();
+        batch.dispose();
+
+    }
 }
