@@ -1,68 +1,64 @@
 package com.copsrobbers.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class CopsAndRobbersV1 extends ApplicationAdapter {
 
-    private TiledMap map;
-    private OrthogonalTiledMapRenderer renderer;
-    private OrthographicCamera camera;
-    private Texture robberImg;
-    private SpriteBatch batch;
-    private Rectangle robber;
-
-    private Pool<Rectangle> rectPool = new Pool<Rectangle>() {
+    private final Pool<Rectangle> rectPool = new Pool<Rectangle>() {
         @Override
         protected Rectangle newObject() {
             return new Rectangle();
         }
     };
-    private Array<Rectangle> tiles = new Array<Rectangle>();
-
+    private final Array<Rectangle> tiles = new Array<>();
+    private TiledMap map;
+    private OrthogonalTiledMapRenderer renderer;
+    private OrthographicCamera camera;
+    private SpriteBatch batch;
+    private Texture robberImg;
+    private Texture copImg;
+    private Rectangle robber;
+    private Rectangle cop;
 
     @Override
     public void create() {
-        map = new TmxMapLoader().load("BlackAndWhiteTiles.tmx");
+        map = new TmxMapLoader().load("map.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1f);
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 320, 320);
+        camera.setToOrtho(false, 640, 640);
         camera.update();
 
-        robberImg = new Texture(Gdx.files.internal("walka.PNG"));
+        renderer = new OrthogonalTiledMapRenderer(map);
+
+        robberImg = new Texture(Gdx.files.internal("robber_walk.PNG"));
+        copImg = new Texture(Gdx.files.internal("cop_walk.png"));
 
         batch = new SpriteBatch();
         robber = new Rectangle();
-        robber.x = 0;
-        robber.y = 0;
+        robber.x = 32*2;
+        robber.y = 32*11;
         robber.width = 32;
         robber.height = 32;
+
+        cop = new Rectangle();
+        cop.x = 32*4;
+        cop.y = 32*4;
+        cop.width = 32;
+        cop.height = 32;
 
     }
 
@@ -70,58 +66,93 @@ public class CopsAndRobbersV1 extends ApplicationAdapter {
     public void render() {
         ScreenUtils.clear(0, 0, 0.2f, 1);
 
+        if (Gdx.input.isKeyJustPressed(Keys.LEFT)) {
+            updateRobber(MOVES.LEFT);
+        }
+        if (Gdx.input.isKeyJustPressed(Keys.RIGHT)) {
+            updateRobber(MOVES.RIGHT);
+        }
+        if (Gdx.input.isKeyJustPressed(Keys.UP)) {
+            updateRobber(MOVES.UP);
+        }
+        if (Gdx.input.isKeyJustPressed(Keys.DOWN)) {
+            updateRobber(MOVES.DOWN);
+        }
         renderer.setView(camera);
         renderer.render();
+        if (robber.x < 320) {
+            camera.position.x = 320;
+        } else if (robber.x > 2880) {
+            camera.position.x = 2880;
+        } else {
+            camera.position.x = robber.x;
+        }
+        if (robber.y < 320) {
+            camera.position.y = 320;
+        } else if (robber.y > 2880) {
+            camera.position.y = 2880;
+        } else {
+            camera.position.y = robber.y;
+        }
+
         camera.update();
         batch.setProjectionMatrix(camera.combined);
-
-
-        if (Gdx.input.isTouched()) {
-            Vector3 touchPos = new Vector3();
-            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            camera.unproject(touchPos);
-            updaterobber(touchPos);
-
-        }
         batch.begin();
         batch.draw(robberImg, robber.x, robber.y, robber.width, robber.height);
+        batch.draw(copImg, cop.x, cop.y, cop.width, cop.height);
         batch.end();
 
     }
 
-    private void updaterobber(Vector3 touchPos) {
-
-        Rectangle robberRect = rectPool.obtain();
-        int startX, startY, endX, endY;
-        startX = (int) (touchPos.x);
-        endX = (int) (touchPos.x + robber.width);
-        startY = (int) (touchPos.y);
-        endY = (int) (touchPos.y + robber.height);
-        getTiles(startX, startY, endX, endY, tiles);
-        if (tiles.size != 0) {
-            return;
-        }
-
-        robber.x = (float) (Math.floor(touchPos.x / robber.width) * robber.width);
-        robber.y = (float) (Math.floor(touchPos.y / robber.width) * robber.width);
-
-    }
-
-    private void getTiles(int startX, int startY, int endX, int endY, Array<Rectangle> tiles) {
+    private void updateRobber(MOVES move) {
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("walls");
         rectPool.freeAll(tiles);
         tiles.clear();
-        int i = (int) Math.floor(startX / robber.width);
-        int j = (int) Math.floor(startY / robber.height);
+        int i = (int) Math.floor(robber.x / robber.width);
+        int j = (int) Math.floor(robber.y / robber.height);
+        Cell cell = null;
+        float curX = robber.x;
+        float curY = robber.y;
+        switch (move) {
+            case LEFT:
+                cell = layer.getCell(i - 1, j);
+                robber.x -= robber.width;
+                break;
+            case RIGHT:
+                cell = layer.getCell(i + 1, j);
+                robber.x += robber.width;
+                break;
+            case UP:
+                cell = layer.getCell(i, j + 1);
+                robber.y += robber.height;
+                break;
+            case DOWN:
+                cell = layer.getCell(i, j - 1);
+                robber.y -= robber.height;
+                break;
+        }
 
-        Cell cell = layer.getCell(i, j);
         if (cell != null) {
             Rectangle rect = rectPool.obtain();
             rect.set(i, j, 1, 1);
             tiles.add(rect);
         }
+        if (tiles.size != 0) {
+            robber.x = curX;
+            robber.y = curY;
+           
+        }
+        else{
+            robber.x = (float) (Math.floor(robber.x / robber.width) * robber.width);
+            robber.y = (float) (Math.floor(robber.y / robber.width) * robber.width);
+        }
+        
+        updateCop();
+
     }
 
+    private void updateCop() {
+    }
 
     @Override
     public void dispose() {
@@ -129,4 +160,7 @@ public class CopsAndRobbersV1 extends ApplicationAdapter {
         batch.dispose();
 
     }
+
+
+    private enum MOVES {LEFT, RIGHT, UP, DOWN}
 }
