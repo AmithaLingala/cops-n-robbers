@@ -6,15 +6,31 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.copsrobbers.game.algorithm.CellModel;
+import com.copsrobbers.game.algorithm.GraphManager;
+import com.copsrobbers.game.algorithm.LevelGenerator;
+import com.copsrobbers.game.algorithm.Node;
+import com.copsrobbers.game.characters.Cop;
+import com.copsrobbers.game.characters.Robber;
+import com.copsrobbers.game.listeners.GameListener;
+import com.copsrobbers.game.listeners.SimpleDirectionGestureDetector;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Random;
 
 public class CopsAndRobbersV1 extends ApplicationAdapter {
 
@@ -31,127 +47,206 @@ public class CopsAndRobbersV1 extends ApplicationAdapter {
     private SpriteBatch batch;
     private Texture robberImg;
     private Texture copImg;
-    private Rectangle robber;
-    private Rectangle cop;
+    private Robber robber;
+    private Cop cop;
+    private boolean isGameEnded = false;
+    private Utils utils;
+
 
     @Override
     public void create() {
-        map = new TmxMapLoader().load("map.tmx");
-        renderer = new OrthogonalTiledMapRenderer(map, 1f);
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 640, 640);
-        camera.update();
+        int tileWidth = 32;
+        int tileHeight =32;
+        int screenWidth = Gdx.graphics.getWidth();
+        int screenHeight = Gdx.graphics.getHeight();
 
-        renderer = new OrthogonalTiledMapRenderer(map);
+        CellModel cells[][] = new CellModel[screenWidth/tileWidth][screenHeight/tileHeight];
+        LevelGenerator level = new LevelGenerator(cells);
+        level.generate();
+
+        TiledMap map = new TiledMap();
+        MapLayers layers = map.getLayers();
+        TiledMapTileLayer background = new TiledMapTileLayer(screenWidth,screenHeight,tileWidth,tileHeight);
+        TiledMapTileLayer walls = new TiledMapTileLayer(screenWidth,screenHeight,tileWidth,tileHeight);
+        background.setName("background");
+        walls.setName("walls");
+        Texture tiles = new Texture(Gdx.files.internal("blackandwhite.png"));
+        TextureRegion[][] textureRegions = TextureRegion.split(tiles,tileWidth,tileHeight);
+
+        for(int i=0;i<cells.length;i++){
+            for(int j=0; j<cells[0].length;j++){
+                Cell cell = new Cell();
+                if(cells[i][j].isWall()) {
+                    cell.setTile(new StaticTiledMapTile(textureRegions[0][0]));
+                    walls.setCell(i,j,cell);
+                }
+                else{
+                    cell.setTile(new StaticTiledMapTile(textureRegions[0][1]));
+                    background.setCell(i,j,cell);
+                }
+
+            }
+        }
+        layers.add(background);
+        layers.add(walls);
+
+        //map = new TmxMapLoader().load("BlackAndWhiteTiles.tmx");
+        utils = Utils.init(map);
+        renderer = new OrthogonalTiledMapRenderer(map, 1);
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, utils.getScreenWidth(), utils.getScreenHeight());
+        camera.update();
 
         robberImg = new Texture(Gdx.files.internal("robber_walk.PNG"));
         copImg = new Texture(Gdx.files.internal("cop_walk.png"));
 
         batch = new SpriteBatch();
-        robber = new Rectangle();
-        robber.x = 32*2;
-        robber.y = 32*11;
-        robber.width = 32;
-        robber.height = 32;
+        Rectangle robberRect = new Rectangle();
+        setRandomPos(map,robberRect);
 
-        cop = new Rectangle();
-        cop.x = 32*4;
-        cop.y = 32*4;
-        cop.width = 32;
-        cop.height = 32;
+        robberRect.width = utils.getTilesize();
+        robberRect.height = utils.getTilesize();
 
+        robber = new Robber(robberRect);
+
+
+
+        Rectangle copRect = new Rectangle();
+        setRandomPos(map,copRect);
+
+        copRect.width = utils.getTilesize();
+        copRect.height = utils.getTilesize();
+
+        cop = new Cop(copRect, new GameListener() {
+            @Override
+            public void endGame() {
+                isGameEnded = true;
+            }
+        });
+
+
+        Gdx.input.setInputProcessor(new SimpleDirectionGestureDetector(new SimpleDirectionGestureDetector.DirectionListener() {
+
+            @Override
+            public void onUp() {
+                if(!isGameEnded) {
+                    robber.update(MOVES.UP);
+                    cop.update(robber);
+                }
+            }
+
+            @Override
+            public void onRight() {
+                if(!isGameEnded) {
+                    robber.update(MOVES.RIGHT);
+                    cop.update(robber);
+                }
+            }
+
+            @Override
+            public void onLeft() {
+                if(!isGameEnded) {
+                    robber.update(MOVES.LEFT);
+                    cop.update(robber);
+                }
+            }
+
+            @Override
+            public void onDown() {
+                if(!isGameEnded) {
+                    robber.update(MOVES.DOWN);
+                    cop.update(robber);
+                }
+            }
+
+        }));
+
+    }
+
+    private void setRandomPos(TiledMap map, Rectangle charRect) {
+        ArrayList<Node> cells = new ArrayList<Node>();
+        TiledMapTileLayer background = (TiledMapTileLayer) map.getLayers().get("background");
+        for(int i=0;i<background.getWidth();i++){
+            for(int j =0;j<background.getHeight();j++)
+            {
+                Cell cell = background.getCell(i,j);
+                if(cell !=null){
+                    cells.add(new Node(i,j));
+                }
+            }
+        }
+
+        Random random = new Random();
+
+        Node pos =  cells.get(random.nextInt(cells.size()));
+        charRect.x = pos.getX()*utils.getTilesize();
+        charRect.y = pos.getY()*utils.getTilesize();
     }
 
     @Override
     public void render() {
-        ScreenUtils.clear(0, 0, 0.2f, 1);
+        ScreenUtils.clear(0, 0, 0, 1);
 
-        if (Gdx.input.isKeyJustPressed(Keys.LEFT)) {
-            updateRobber(MOVES.LEFT);
+        if(!isGameEnded){
+            MOVES move = getMove();
+            if(move!=null) {
+                robber.update(move);
+                cop.update(robber);
+            }
+
         }
-        if (Gdx.input.isKeyJustPressed(Keys.RIGHT)) {
-            updateRobber(MOVES.RIGHT);
-        }
-        if (Gdx.input.isKeyJustPressed(Keys.UP)) {
-            updateRobber(MOVES.UP);
-        }
-        if (Gdx.input.isKeyJustPressed(Keys.DOWN)) {
-            updateRobber(MOVES.DOWN);
-        }
+
         renderer.setView(camera);
         renderer.render();
-        if (robber.x < 320) {
-            camera.position.x = 320;
-        } else if (robber.x > 2880) {
-            camera.position.x = 2880;
-        } else {
-            camera.position.x = robber.x;
-        }
-        if (robber.y < 320) {
-            camera.position.y = 320;
-        } else if (robber.y > 2880) {
-            camera.position.y = 2880;
-        } else {
-            camera.position.y = robber.y;
-        }
+        // Commeting camera movement with player
+//        if (robber.getX() < utils.getMapWidth()) {
+//            camera.position.x = utils.getMapWidth();
+//        } else if (robber.getX() > 2880) {
+//            camera.position.x = 2880;
+//        } else {
+//            camera.position.x = robber.getX();
+//        }
+//        if (robber.getY() < utils.getMapHeight()) {
+//            camera.position.y = utils.getMapHeight();
+//        } else if (robber.getY() > 2880) {
+//            camera.position.y = 2880;
+//        } else {
+//            camera.position.y = robber.getY();
+//        }
+      //  camera.position.y = utils.getScreenWidth()/2 - (utils.getMapHeight()*utils.getScale())/2;
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        batch.draw(robberImg, robber.x, robber.y, robber.width, robber.height);
-        batch.draw(copImg, cop.x, cop.y, cop.width, cop.height);
+        batch.draw(robberImg, robber.getX(), robber.getY(), robber.getWidth(), robber.getHeight());
+        batch.draw(copImg, cop.getX(), cop.getY(), cop.getWidth(), cop.getHeight());
         batch.end();
 
     }
 
-    private void updateRobber(MOVES move) {
-        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("walls");
-        rectPool.freeAll(tiles);
-        tiles.clear();
-        int i = (int) Math.floor(robber.x / robber.width);
-        int j = (int) Math.floor(robber.y / robber.height);
-        Cell cell = null;
-        float curX = robber.x;
-        float curY = robber.y;
-        switch (move) {
-            case LEFT:
-                cell = layer.getCell(i - 1, j);
-                robber.x -= robber.width;
-                break;
-            case RIGHT:
-                cell = layer.getCell(i + 1, j);
-                robber.x += robber.width;
-                break;
-            case UP:
-                cell = layer.getCell(i, j + 1);
-                robber.y += robber.height;
-                break;
-            case DOWN:
-                cell = layer.getCell(i, j - 1);
-                robber.y -= robber.height;
-                break;
+    private MOVES getMove() {
+        MOVES move = null;
+        if (Gdx.input.isKeyJustPressed(Keys.LEFT)) {
+            move = MOVES.LEFT;
         }
-
-        if (cell != null) {
-            Rectangle rect = rectPool.obtain();
-            rect.set(i, j, 1, 1);
-            tiles.add(rect);
+        else if (Gdx.input.isKeyJustPressed(Keys.RIGHT)) {
+            move = MOVES.RIGHT;
         }
-        if (tiles.size != 0) {
-            robber.x = curX;
-            robber.y = curY;
-           
+        else if (Gdx.input.isKeyJustPressed(Keys.UP)) {
+            move = MOVES.UP;
         }
-        else{
-            robber.x = (float) (Math.floor(robber.x / robber.width) * robber.width);
-            robber.y = (float) (Math.floor(robber.y / robber.width) * robber.width);
+        else if (Gdx.input.isKeyJustPressed(Keys.DOWN)) {
+            move = MOVES.DOWN;
         }
-        
-        updateCop();
-
+        return move;
     }
 
-    private void updateCop() {
+
+
+
+    private void endGame() {
+        isGameEnded = true;
+        System.out.println("Game Endu");
     }
 
     @Override
@@ -162,5 +257,5 @@ public class CopsAndRobbersV1 extends ApplicationAdapter {
     }
 
 
-    private enum MOVES {LEFT, RIGHT, UP, DOWN}
+    public enum MOVES {LEFT, RIGHT, UP, DOWN}
 }
