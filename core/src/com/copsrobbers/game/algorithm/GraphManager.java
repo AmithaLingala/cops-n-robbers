@@ -22,8 +22,8 @@ public class GraphManager {
         background = (TiledMapTileLayer) map.getLayers().get("background");
         tileWidth = walls.getTileWidth();
         tileHeight = walls.getTileHeight();
-        mapWidth = background.getWidth();
-        mapHeight = background.getHeight();
+        mapWidth = background.getWidth()/tileWidth;
+        mapHeight = background.getHeight()/tileHeight;
         }
 
     public ArrayList<ArrayList<Integer>> generateGraph() {
@@ -47,11 +47,11 @@ public class GraphManager {
         if(x+1< mapWidth && walls.getCell(x+1,y)==null){
             neighbours.add(((x + 1) * mapWidth) + y);
         }
-        if(y+1<mapHeight && walls.getCell(x,y+1)==null){
-            neighbours.add(x * mapWidth + y + 1);
-        }
         if(x-1>=0 && walls.getCell(x-1,y)==null){
             neighbours.add((x - 1) * mapWidth + y);
+        }
+        if(y+1<mapHeight && walls.getCell(x,y+1)==null){
+            neighbours.add(x * mapWidth + y + 1);
         }
         if(y-1>=0 && walls.getCell(x,y-1)==null){
             neighbours.add(x * mapWidth + (y - 1));
@@ -69,15 +69,16 @@ public class GraphManager {
         int v = adj.size();
         int pred[] = new int[v];
         int dist[] = new int[v];
+        LinkedList<Integer> path = new LinkedList<Integer>();
 
         if (BFS(adj, source, dest, v, pred, dist) == false) {
             System.out.println("Given source and destination" +
                     "are not connected");
-            return null;
+            return path;
         }
 
         // LinkedList to store path
-        LinkedList<Integer> path = new LinkedList<Integer>();
+
         int crawl = dest;
         path.add(crawl);
         while (pred[crawl] != -1) {
@@ -90,9 +91,9 @@ public class GraphManager {
 
         // Print path
         System.out.println("Path is ::");
-        for (int i = path.size() - 1; i >= 0; i--) {
-            System.out.print(path.get(i)/(this.mapWidth/this.tileHeight) +" "+ path.get(i)%(this.mapWidth/this.tileHeight) + ", ");
-        }
+//        for (int i = path.size() - 1; i >= 0; i--) {
+//          //  System.out.print(path.get(i)/(this.mapWidth/this.tileHeight) +" "+ path.get(i)%(this.mapWidth/this.tileHeight) + ", ");
+//        }
         return path;
     }
     private static boolean BFS(ArrayList<ArrayList<Integer>> adj, int src,

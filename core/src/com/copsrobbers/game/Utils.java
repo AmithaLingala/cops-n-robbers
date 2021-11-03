@@ -1,6 +1,7 @@
 package com.copsrobbers.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 
@@ -66,9 +67,9 @@ public class Utils {
     }
 
     public static Utils init(TiledMap map){
-        if(instance!=null) {
-            return instance;
-        }
+//        if(instance!=null) {
+//            return instance;
+//        }
 
         instance = new Utils();
         instance.map = map;
@@ -91,4 +92,12 @@ public class Utils {
     public static Utils obtain(){
         return Utils.instance;
     }
+
+    public void updateScore(int score){
+        Preferences prefs = Gdx.app.getPreferences(CopsAndRobbersV1.class.getName());
+        int curScore = prefs.getInteger("Score",0);
+        curScore = curScore + score;
+        prefs.putInteger("Score", curScore);
+    }
+
 }

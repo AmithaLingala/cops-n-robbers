@@ -1,8 +1,7 @@
 package com.copsrobbers.game.characters;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
-import com.copsrobbers.game.CopsAndRobbersV1;
 import com.copsrobbers.game.Utils;
+import com.copsrobbers.game.screens.GameScreen;
 
 public class Character {
     float x;
@@ -51,7 +50,7 @@ public class Character {
         this.height = bounds.height;
          utils = Utils.obtain();
     }
-    public void update(CopsAndRobbersV1.MOVES move){
+    public void update(GameScreen.MOVES move){
 
         int i = (int) Math.floor(this.x / this.width);
         int j = (int) Math.floor(this.y / this.height);
