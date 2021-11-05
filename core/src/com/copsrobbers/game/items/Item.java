@@ -1,5 +1,6 @@
 package com.copsrobbers.game.items;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.copsrobbers.game.Utils;
@@ -61,10 +62,12 @@ public abstract class Item extends Image {
             return false;
 
     }
-    public abstract void use();
+    public abstract void collect();
 
     @Override
     public void act(float delta) {
         super.act(delta);
     }
+
+    public abstract TextureRegion getRegion(float stateTime);
 }

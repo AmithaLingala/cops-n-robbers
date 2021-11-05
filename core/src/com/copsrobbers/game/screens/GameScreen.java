@@ -4,10 +4,13 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -16,7 +19,9 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -27,6 +32,7 @@ import com.copsrobbers.game.algorithm.Node;
 import com.copsrobbers.game.characters.Cop;
 import com.copsrobbers.game.characters.Robber;
 import com.copsrobbers.game.items.Coin;
+import com.copsrobbers.game.items.Item;
 import com.copsrobbers.game.items.Weapon;
 import com.copsrobbers.game.listeners.GameListener;
 import com.copsrobbers.game.listeners.SimpleDirectionGestureDetector;
@@ -54,6 +60,8 @@ public class GameScreen implements Screen {
     private final Stage stage;
     private Coin coin;
     private Weapon weapon;
+    private Label score;
+
 
     public GameScreen(Game game) {
         this.game = game;
@@ -80,7 +88,7 @@ public class GameScreen implements Screen {
         walls.setName("walls");
         Texture tiles = new Texture(Gdx.files.internal("blackandwhite.png"));
         TextureRegion[][] textureRegions = TextureRegion.split(tiles, tileWidth, tileHeight);
-
+        Rectangle gate = new Rectangle();
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[0].length; j++) {
                 Cell cell = new Cell();
@@ -88,6 +96,10 @@ public class GameScreen implements Screen {
                     cell.setTile(new StaticTiledMapTile(textureRegions[0][0]));
                     walls.setCell(i, j, cell);
                 } else {
+                    if(cells[i][j].isGate()){
+                        gate.x = i;
+                        gate.y = j;
+                    }
                     cell.setTile(new StaticTiledMapTile(textureRegions[0][1]));
                     background.setCell(i, j, cell);
                 }
@@ -99,6 +111,7 @@ public class GameScreen implements Screen {
 
         //map = new TmxMapLoader().load("BlackAndWhiteTiles.tmx");
         utils = Utils.init(map);
+        utils.setGate(gate);
         renderer = new OrthogonalTiledMapRenderer(map, 1);
         camera = new OrthographicCamera();
         camera.setToOrtho(false, utils.getScreenWidth(), utils.getScreenHeight());
@@ -114,20 +127,19 @@ public class GameScreen implements Screen {
         robberRect.width = utils.getTilesize();
         robberRect.height = utils.getTilesize();
 
-        robber = new Robber(robberRect);
+        robber = new Robber(robberRect,()-> {
+            game.setScreen(new NextLevelScreen(game));
+        });
 
         for (int i = 0; i < copCount; i++) {
             Rectangle copRect = new Rectangle();
             setRandomPos(map, copRect, AREA.values()[i]);
             copRect.width = utils.getTilesize();
             copRect.height = utils.getTilesize();
-            Cop cop = new Cop(copRect, new GameListener() {
-                @Override
-                public void endGame() {
-                    isGameEnded = true;
-                    game.setScreen(new EndScreen(game));
+            Cop cop = new Cop(copRect, () -> {
+                isGameEnded = true;
+                game.setScreen(new EndScreen(game));
 
-                }
             });
             cops.add(cop);
         }
@@ -136,13 +148,32 @@ public class GameScreen implements Screen {
         coinRect.width = utils.getTilesize();
         coinRect.height = utils.getTilesize();
         coin = new Coin(coinRect);
+        utils.addItem(coin);
+
 
         Rectangle weaponRect = new Rectangle();
         setRandomPos(map, weaponRect, AREA.BOTTOMLEFT);
         weaponRect.width = utils.getTilesize();
         weaponRect.height = utils.getTilesize();
         weapon = new Weapon(weaponRect);
+        utils.addItem(weapon);
 
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Amble-Light.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 30;
+        parameter.borderWidth = 1;
+        parameter.color = Color.WHITE;
+        BitmapFont font24 = generator.generateFont(parameter); // font size 24 pixels
+        generator.dispose();
+
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = font24;
+
+         score = new Label("Score: "+ utils.getScore(),labelStyle);
+        score.setSize(Gdx.graphics.getWidth(),utils.getTilesize());
+        score.setAlignment(Align.center);
+        score.setY(utils.getScreenHeight()-utils.getTilesize());
+        stage.addActor(score);
 
         Gdx.input.setInputProcessor(new SimpleDirectionGestureDetector(new SimpleDirectionGestureDetector.DirectionListener() {
 
@@ -252,10 +283,13 @@ public class GameScreen implements Screen {
         charRect.x = pos.getX() * utils.getTilesize();
         charRect.y = pos.getY() * utils.getTilesize();
     }
-
+    private void updateScore(){
+        score.setText("Score: "+utils.getScore());
+    }
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
+        updateScore();
 
         if (!isGameEnded) {
             MOVES move = getMove();
@@ -289,14 +323,19 @@ public class GameScreen implements Screen {
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
+
         batch.begin();
         batch.draw(robberImg, robber.getX(), robber.getY(), robber.getWidth(), robber.getHeight());
         for (Cop cop : cops) {
             batch.draw(copImg, cop.getX(), cop.getY(), cop.getWidth(), cop.getHeight());
         }
-        batch.draw(coin.getRegion(Gdx.graphics.getDeltaTime()), coin.getX(), coin.getY(), coin.getWidth(), coin.getHeight());
-        batch.draw(weapon.getRegion(Gdx.graphics.getDeltaTime()), weapon.getX(), weapon.getY(), weapon.getWidth(), weapon.getHeight());
+        for (Item item: utils.getItems()) {
+            batch.draw(item.getRegion(Gdx.graphics.getDeltaTime()), item.getX(), item.getY(), item.getWidth(), item.getHeight());
+        }
         batch.end();
+        stage.act();
+        stage.draw();
+
 
     }
 
@@ -317,7 +356,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-
+        Gdx.input.setInputProcessor(stage);
     }
 
 

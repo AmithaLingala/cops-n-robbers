@@ -26,7 +26,7 @@ public class Coin extends Item{
         return spin.getKeyFrame(this.stateTime);
     }
     @Override
-    public void use() {
+    public void collect() {
         Utils.obtain().updateScore(score);
     }
 

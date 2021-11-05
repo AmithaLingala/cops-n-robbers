@@ -1,5 +1,8 @@
 package com.copsrobbers.game.algorithm;
 
+import com.badlogic.gdx.math.Rectangle;
+import com.copsrobbers.game.Utils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -48,7 +51,12 @@ public class LevelGenerator {
             cells[i][0].setWall(true);
             cells[i][cells[0].length - 1].setWall(true);
         }
-        cells[1][cells[0].length - 1].setWall(false);
+        Rectangle gate = new Rectangle();
+        gate.x = 1;
+        gate.y = cells[0].length-1;
+        cells[(int) gate.x][(int) gate.y].setWall(false);
+        cells[(int) gate.x][(int) gate.y].setGate(true);
+
         //Compute cell frontier and add it to a frontier collection
         //  Set<CellModel> frontierCells = new HashSet<>(frontierCellsOf(cells[x][y]));
 

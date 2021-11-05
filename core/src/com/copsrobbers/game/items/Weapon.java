@@ -21,13 +21,15 @@ public class Weapon extends Item{
     public Weapon(Rectangle bounds){
         this(bounds,1);
     }
+
+    @Override
+    public void collect() {
+
+    }
+
     public TextureRegion getRegion(float stateTime){
         this.stateTime += stateTime;
         return spin.getKeyFrame(this.stateTime);
-    }
-    @Override
-    public void use() {
-        Utils.obtain().updateScore(score);
     }
 
 }

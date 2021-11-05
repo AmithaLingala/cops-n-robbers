@@ -1,7 +1,10 @@
 package com.copsrobbers.game.characters;
 import com.badlogic.gdx.math.Rectangle;
 import com.copsrobbers.game.Utils;
+import com.copsrobbers.game.items.Item;
 import com.copsrobbers.game.screens.GameScreen;
+
+import java.util.ArrayList;
 
 public class Character {
     float x;
@@ -86,5 +89,6 @@ public class Character {
             this.x = (float) (Math.floor(this.x / this.width) * this.width);
             this.y = (float) (Math.floor(this.y / this.width) * this.width);
         }
+
     }
 }
