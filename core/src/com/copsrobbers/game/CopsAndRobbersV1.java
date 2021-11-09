@@ -11,7 +11,8 @@ public class CopsAndRobbersV1 extends Game {
 
     @Override
     public void create() {
-        gameSkin = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
+        gameSkin = new Skin(Gdx.files.internal("skin/holo/Holo-dark-mdpi.json"));
+
         this.setScreen(new TitleScreen(this));
     }
 

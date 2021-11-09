@@ -20,8 +20,8 @@ GameListener gl;
     private LinkedList<Integer> catchRobber( Robber robber){
         GraphManager G = new GraphManager();
         ArrayList<ArrayList<Integer>> adj = G.generateGraph();
-        int copPos = (int) (((this.x /this.width ) * (this.utils.getMapWidth()/this.utils.getTilesize())) + (this.y/this.height));
-        int robberPos = (int) (((robber.x /robber.width ) * (this.utils.getMapWidth()/this.utils.getTilesize())) + (robber.y/robber.height));
+        int copPos = (int) (((this.x /this.width ) * (this.mapManager.getMapWidth()/this.mapManager.getTileSize())) + (this.y/this.height));
+        int robberPos = (int) (((robber.x /robber.width ) * (this.mapManager.getMapWidth()/this.mapManager.getTileSize())) + (robber.y/robber.height));
 
         return G.printShortestDistance(adj,copPos,robberPos);
     }
@@ -32,8 +32,8 @@ GameListener gl;
             gl.endGame();
         }
         else {
-            int x = (int) (path.get(path.size() - 2) / (this.utils.getMapWidth() / this.utils.getTilesize()));
-            int y = (int) (path.get(path.size() - 2) % (this.utils.getMapWidth() / this.utils.getTilesize()));
+            int x = (int) (path.get(path.size() - 2) / (this.mapManager.getMapWidth() / this.mapManager.getTileSize()));
+            int y = (int) (path.get(path.size() - 2) % (this.mapManager.getMapWidth() / this.mapManager.getTileSize()));
 
             this.x = x * this.width;
             this.y = y * this.height;

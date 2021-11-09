@@ -2,7 +2,7 @@ package com.copsrobbers.game.algorithm;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.copsrobbers.game.Utils;
+import com.copsrobbers.game.MapManager;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -14,16 +14,19 @@ public class GraphManager {
     private final int tileHeight;
     private final int mapWidth;
     private final int mapHeight;
+    private MapManager mapManager;
 
 
     public GraphManager() {
-        TiledMap map = Utils.obtain().getMap();
+        mapManager = MapManager.obtain();
+        TiledMap map = mapManager.getMap();
         walls = (TiledMapTileLayer) map.getLayers().get("walls");
         background = (TiledMapTileLayer) map.getLayers().get("background");
         tileWidth = walls.getTileWidth();
         tileHeight = walls.getTileHeight();
         mapWidth = background.getWidth()/tileWidth;
         mapHeight = background.getHeight()/tileHeight;
+
         }
 
     public ArrayList<ArrayList<Integer>> generateGraph() {
@@ -44,16 +47,16 @@ public class GraphManager {
             int x = pos/ mapWidth;
             int y = pos% mapWidth;
 
-        if(x+1< mapWidth && walls.getCell(x+1,y)==null){
+        if(x+1< mapWidth && mapManager.canMove(x+1,y)){
             neighbours.add(((x + 1) * mapWidth) + y);
         }
-        if(x-1>=0 && walls.getCell(x-1,y)==null){
+        if(x-1>=0 && mapManager.canMove(x-1,y)){
             neighbours.add((x - 1) * mapWidth + y);
         }
-        if(y+1<mapHeight && walls.getCell(x,y+1)==null){
+        if(y+1<mapHeight && mapManager.canMove(x,y+1)){
             neighbours.add(x * mapWidth + y + 1);
         }
-        if(y-1>=0 && walls.getCell(x,y-1)==null){
+        if(y-1>=0 && mapManager.canMove(x,y-1)){
             neighbours.add(x * mapWidth + (y - 1));
         }
         return neighbours;

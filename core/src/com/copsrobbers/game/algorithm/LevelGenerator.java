@@ -1,7 +1,6 @@
 package com.copsrobbers.game.algorithm;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.copsrobbers.game.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ public class LevelGenerator {
         /* Start with a grid full of cellModelViews in state wall (not a path). */
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[0].length; j++) {
-                cells[i][j] = new CellModel(i, j, true);
+                cells[i][j] = new CellModel(i, j, false);
                 //cell[j].setWall(true);
             }
         }
@@ -40,7 +39,8 @@ public class LevelGenerator {
 //               int x = random.nextInt(cells.length);
 //               int y = random.nextInt(cells[0].length);
                 boolean flag = random.nextInt(100) < level * 5;
-                cells[i][j].setWall(flag); //set cell to path
+                //cells[i][j].setWall(flag); //set cell to path
+                cells[i][j].setBox(flag);
             }
         }
         for (int i = 0; i < cells[0].length; i++) {

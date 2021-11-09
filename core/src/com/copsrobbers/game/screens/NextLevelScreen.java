@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.copsrobbers.game.CopsAndRobbersV1;
-import com.copsrobbers.game.Utils;
+import com.copsrobbers.game.MapManager;
 
 public class NextLevelScreen implements Screen {
     private final Stage stage;
@@ -25,7 +25,7 @@ public class NextLevelScreen implements Screen {
         game = aGame;
         stage = new Stage(new ScreenViewport());
 
-        TextButton playButton = new TextButton("Go to next level", CopsAndRobbersV1.gameSkin,"small");
+        TextButton playButton = new TextButton("Go to next level", CopsAndRobbersV1.gameSkin);
         playButton.setWidth(Gdx.graphics.getWidth()/2.0f);
         playButton.setPosition(Gdx.graphics.getWidth()/2.0f-playButton.getWidth()/2,Gdx.graphics.getHeight()/2.0f-playButton.getHeight()/2);
         playButton.addListener(new InputListener(){
@@ -48,11 +48,11 @@ public class NextLevelScreen implements Screen {
 
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = font24;
-        Utils utils = Utils.obtain();
-        Label score = new Label("Score: "+ utils.getScore(),labelStyle);
-        score.setSize(Gdx.graphics.getWidth(),utils.getTilesize());
+        MapManager mapManager = MapManager.obtain();
+        Label score = new Label("Score: "+ mapManager.getScore(),labelStyle);
+        score.setSize(Gdx.graphics.getWidth(), mapManager.getTileSize());
         score.setAlignment(Align.center);
-        score.setY(utils.getScreenHeight()-utils.getTilesize());
+        score.setY(mapManager.getScreenHeight()- mapManager.getTileSize());
         stage.addActor(score);
         stage.addActor(playButton);
 

@@ -13,22 +13,15 @@ import com.copsrobbers.game.CopsAndRobbersV1;
 
 public class TitleScreen implements Screen {
 
-    private Stage stage;
-    private Game game;
+    private final Stage stage;
+    private final Game game;
 
     public TitleScreen(Game aGame) {
         game = aGame;
         stage = new Stage(new ScreenViewport());
-
-//        Label title = new Label("Title Screen", CopsAndRobbersV1.gameSkin);
-//        title.setAlignment(Align.center);
-//        title.setY(Gdx.graphics.getHeight()*2/3);
-//        title.setWidth(Gdx.graphics.getWidth());
-//        stage.addActor(title);
-
-        TextButton playButton = new TextButton("Play!",CopsAndRobbersV1.gameSkin,"small");
-        playButton.setWidth(Gdx.graphics.getWidth()/2);
-        playButton.setPosition(Gdx.graphics.getWidth()/2-playButton.getWidth()/2,Gdx.graphics.getHeight()/2-playButton.getHeight()/2);
+        TextButton playButton = new TextButton("Play!",CopsAndRobbersV1.gameSkin);
+        playButton.setWidth(Gdx.graphics.getWidth()/2.0f);
+        playButton.setPosition(Gdx.graphics.getWidth()/2.0f-playButton.getWidth()/2,Gdx.graphics.getHeight()/2.0f-playButton.getHeight()/2);
         playButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {

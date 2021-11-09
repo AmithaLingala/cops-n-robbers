@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.copsrobbers.game.Utils;
+import com.copsrobbers.game.MapManager;
 
 public class Coin extends Item{
     private final int score;
@@ -27,7 +27,7 @@ public class Coin extends Item{
     }
     @Override
     public void collect() {
-        Utils.obtain().updateScore(score);
+        MapManager.obtain().updateScore(score);
     }
 
 }

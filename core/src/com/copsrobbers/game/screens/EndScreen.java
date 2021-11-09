@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.copsrobbers.game.CopsAndRobbersV1;
-import com.copsrobbers.game.Utils;
+import com.copsrobbers.game.MapManager;
 
 public class EndScreen implements Screen {
     private Stage stage;
@@ -20,13 +20,13 @@ public class EndScreen implements Screen {
         game = aGame;
         stage = new Stage(new ScreenViewport());
 
-        TextButton playButton = new TextButton("Retry", CopsAndRobbersV1.gameSkin,"small");
+        TextButton playButton = new TextButton("Retry", CopsAndRobbersV1.gameSkin);
         playButton.setWidth(Gdx.graphics.getWidth()/2);
         playButton.setPosition(Gdx.graphics.getWidth()/2-playButton.getWidth()/2,Gdx.graphics.getHeight()/2-playButton.getHeight()/2);
         playButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-                Utils.obtain().setScore(0);
+                MapManager.obtain().setScore(0);
                 game.setScreen(new GameScreen(game));
             }
             @Override

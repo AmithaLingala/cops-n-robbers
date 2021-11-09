@@ -1,10 +1,7 @@
 package com.copsrobbers.game.characters;
 import com.badlogic.gdx.math.Rectangle;
-import com.copsrobbers.game.Utils;
-import com.copsrobbers.game.items.Item;
+import com.copsrobbers.game.MapManager;
 import com.copsrobbers.game.screens.GameScreen;
-
-import java.util.ArrayList;
 
 public class Character {
     float x;
@@ -44,14 +41,14 @@ public class Character {
 
     float width;
     float height;
-    Utils utils;
+    MapManager mapManager;
     public Character(Rectangle bounds)
     {
         this.x = bounds.x;
         this.y = bounds.y;
         this.width = bounds.width;
         this.height = bounds.height;
-         utils = Utils.obtain();
+         mapManager = MapManager.obtain();
     }
     public void update(GameScreen.MOVES move){
 
@@ -59,31 +56,30 @@ public class Character {
         int j = (int) Math.floor(this.y / this.height);
         float curX = this.x;
         float curY = this.y;
-        boolean hasWall = true;
+        boolean canMove = false;
 
         switch (move) {
             case LEFT:
-                hasWall = utils.hasWall(i - 1, j);
+                canMove = mapManager.canMove(i - 1, j);
                 this.x -= this.width;
                 break;
             case RIGHT:
-                hasWall = utils.hasWall(i + 1, j);
+                canMove = mapManager.canMove(i + 1, j);
                 this.x += this.width;
                 break;
             case UP:
-                hasWall = utils.hasWall(i, j + 1);
+                canMove = mapManager.canMove(i, j + 1);
                 this.y += this.height;
                 break;
             case DOWN:
-                hasWall = utils.hasWall(i, j - 1);
+                canMove = mapManager.canMove(i, j - 1);
                 this.y -= this.height;
                 break;
         }
 
-        if (hasWall) {
+        if (!canMove) {
             this.x = curX;
             this.y = curY;
-
         }
         else{
             this.x = (float) (Math.floor(this.x / this.width) * this.width);

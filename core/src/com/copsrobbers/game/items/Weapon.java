@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.copsrobbers.game.Utils;
+import com.copsrobbers.game.MapManager;
 
 public class Weapon extends Item{
     private final int score;
@@ -13,8 +13,8 @@ public class Weapon extends Item{
     public Weapon(Rectangle bounds, int score) {
         super(bounds);
         this.score = score;
-        Texture coinTexture = new Texture("EMP.png");
-        TextureRegion[] regions = TextureRegion.split(coinTexture, 32, 32)[0];
+        Texture weaponTexture = new Texture("EMP.png");
+        TextureRegion[] regions = TextureRegion.split(weaponTexture, 32, 32)[0];
         spin = new Animation<>(0.10f, regions);
         spin.setPlayMode(Animation.PlayMode.LOOP);
     }
@@ -24,7 +24,7 @@ public class Weapon extends Item{
 
     @Override
     public void collect() {
-
+        MapManager.obtain().updateWeaponCount(1);
     }
 
     public TextureRegion getRegion(float stateTime){

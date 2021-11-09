@@ -9,6 +9,7 @@ public class CellModel {
     //support to fire property change events
     private PropertyChangeSupport pcs;
     private boolean isGate;
+    private boolean isBox;
 
     public CellModel(int row, int column) {
         this(row, column, false);
@@ -52,6 +53,24 @@ public class CellModel {
         Object old = this.isWall;
         this.isWall = isWall;
         firePropertyChange("Wall", old, isWall);
+    }
+
+
+    /**
+     * Get {@link #isBox}
+     */
+    public boolean isBox() {
+        return isBox;
+    }
+
+
+    /**
+     * Set {@link #isBox}
+     */
+    public void setBox(boolean isBox) {
+        Object old = this.isBox;
+        this.isBox = isBox;
+        firePropertyChange("Box", old, isBox);
     }
 
     /**
