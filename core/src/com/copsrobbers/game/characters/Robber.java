@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.copsrobbers.game.GameManager;
 import com.copsrobbers.game.MapManager;
 import com.copsrobbers.game.algorithm.CellModel;
 import com.copsrobbers.game.items.Item;
@@ -80,6 +81,7 @@ public class Robber extends Character {
                     super.clicked(event, x, y);
                     mapManager.updateTileType(cell, MapManager.Layers.BACKGROUND);
                     clearTargets();
+                    GameManager.updateWeapons(-1);
                 }
             });
             actors.add(actor);

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.copsrobbers.game.GameManager;
 import com.copsrobbers.game.MapManager;
 
 public class Weapon extends Item{
@@ -24,7 +25,7 @@ public class Weapon extends Item{
 
     @Override
     public void collect() {
-        MapManager.obtain().updateWeaponCount(1);
+        GameManager.updateWeapons(1);
     }
 
     public TextureRegion getRegion(float stateTime){

@@ -30,7 +30,6 @@ public class MapManager {
     private float mapWidth;
     private float mapHeight;
     private Rectangle gate;
-    private int weaponCount = 0;
 
     public MapManager() {
         items = new ArrayList<>();
@@ -45,13 +44,6 @@ public class MapManager {
         return MapManager.instance;
     }
 
-    public int getWeaponCount() {
-        return weaponCount;
-    }
-
-    public void setWeaponCount(int weaponCount) {
-        this.weaponCount = weaponCount;
-    }
 
     public void init(TiledMap map) {
 
@@ -172,16 +164,7 @@ public class MapManager {
         this.gate.y *= tileSize;
     }
 
-    public int getScore() {
 
-        Preferences prefs = Gdx.app.getPreferences(CopsAndRobbersV1.class.getName());
-        return prefs.getInteger("CurrScore", 0);
-    }
-
-    public void setScore(int score) {
-        Preferences prefs = Gdx.app.getPreferences(CopsAndRobbersV1.class.getName());
-        prefs.putInteger("CurrScore", score);
-    }
 
     public ArrayList<Item> getItems() {
         return items;
@@ -201,21 +184,6 @@ public class MapManager {
         return !(hasWall(x, y) || hasObstacle(x, y));
     }
 
-    public void updateScore(int score) {
-        Preferences prefs = Gdx.app.getPreferences(CopsAndRobbersV1.class.getName());
-        int curScore = this.getScore();
-        curScore = curScore + score;
-        this.setScore(curScore);
-        int maxScore = prefs.getInteger("MaxScore", 0);
-        if (maxScore < curScore) {
-            prefs.putInteger("MaxScore", curScore);
-        }
-    }
-
-    public void updateWeaponCount(int count) {
-        weaponCount += count;
-        setWeaponCount(weaponCount);
-    }
 
     public void addItem(Item item) {
         items.add(item);

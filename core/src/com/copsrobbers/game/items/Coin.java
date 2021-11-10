@@ -4,15 +4,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.copsrobbers.game.MapManager;
+import com.copsrobbers.game.GameManager;
 
 public class Coin extends Item{
-    private final int score;
+    private final int count;
     private final Animation<TextureRegion> spin;
     private float stateTime =0;
-    public Coin(Rectangle bounds, int score) {
+    public Coin(Rectangle bounds, int count) {
         super(bounds);
-        this.score = score;
+        this.count = count;
         Texture coinTexture = new Texture("Coins.png");
         TextureRegion[] regions = TextureRegion.split(coinTexture, 32, 32)[0];
         spin = new Animation<>(0.10f, regions);
@@ -27,7 +27,7 @@ public class Coin extends Item{
     }
     @Override
     public void collect() {
-        MapManager.obtain().updateScore(score);
+        GameManager.updateCoins(count);
     }
 
 }

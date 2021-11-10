@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.copsrobbers.game.CopsAndRobbersV1;
+import com.copsrobbers.game.GameManager;
 import com.copsrobbers.game.MapManager;
 
 public class NextLevelScreen implements Screen {
@@ -24,13 +25,15 @@ public class NextLevelScreen implements Screen {
     public NextLevelScreen(Game aGame) {
         game = aGame;
         stage = new Stage(new ScreenViewport());
+        int level = GameManager.getLevel()+1;
 
-        TextButton playButton = new TextButton("Go to next level", CopsAndRobbersV1.gameSkin);
+        TextButton playButton = new TextButton("Go to level "+level, CopsAndRobbersV1.gameSkin);
         playButton.setWidth(Gdx.graphics.getWidth()/2.0f);
         playButton.setPosition(Gdx.graphics.getWidth()/2.0f-playButton.getWidth()/2,Gdx.graphics.getHeight()/2.0f-playButton.getHeight()/2);
         playButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                GameManager.setLevel(level);
                 game.setScreen(new GameScreen(game));
             }
             @Override
@@ -40,20 +43,27 @@ public class NextLevelScreen implements Screen {
         });
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Amble-Light.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 30;
-        parameter.borderWidth = 1;
-        parameter.color = Color.WHITE;
+        parameter.size = 20;
+        parameter.color = Color.BLACK;
         BitmapFont font24 = generator.generateFont(parameter); // font size 24 pixels
         generator.dispose();
 
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = font24;
         MapManager mapManager = MapManager.obtain();
-        Label score = new Label("Score: "+ mapManager.getScore(),labelStyle);
-        score.setSize(Gdx.graphics.getWidth(), mapManager.getTileSize());
-        score.setAlignment(Align.center);
-        score.setY(mapManager.getScreenHeight()- mapManager.getTileSize());
-        stage.addActor(score);
+
+        Label coins = new Label("Coins: "+ GameManager.getCoins(),labelStyle);
+        coins.setSize(Gdx.graphics.getWidth(), mapManager.getTileSize());
+        coins.setAlignment(Align.center);
+        coins.setY(mapManager.getScreenHeight()- 2*mapManager.getTileSize());
+
+        Label weapons = new Label("Weapons: "+ GameManager.getWeapons(),labelStyle);
+        weapons.setSize(Gdx.graphics.getWidth(), mapManager.getTileSize());
+        weapons.setAlignment(Align.center);
+        weapons.setY(mapManager.getScreenHeight()- 3*mapManager.getTileSize());
+
+        stage.addActor(coins);
+        stage.addActor(weapons);
         stage.addActor(playButton);
 
 

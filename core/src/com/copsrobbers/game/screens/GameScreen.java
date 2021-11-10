@@ -26,6 +26,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.copsrobbers.game.CopsAndRobbersV1;
+import com.copsrobbers.game.GameManager;
 import com.copsrobbers.game.MapManager;
 import com.copsrobbers.game.algorithm.Node;
 import com.copsrobbers.game.characters.Cop;
@@ -52,7 +53,8 @@ public class GameScreen implements Screen {
     private List<Cop> cops;
     private boolean isGameEnded = false;
     private MapManager mapManager;
-    private Label score;
+    private Label coins;
+    private Label level;
     private Label weaponCount;
 
 
@@ -65,7 +67,7 @@ public class GameScreen implements Screen {
     public void create() {
         cops = new ArrayList<>();
         mapManager = MapManager.initialize();
-        TiledMap map = mapManager.generate(2);
+        TiledMap map = mapManager.generate(GameManager.getLevel());
         renderer = new OrthogonalTiledMapRenderer(map, 1);
         camera = new OrthographicCamera();
         camera.setToOrtho(false, mapManager.getScreenWidth(), mapManager.getScreenHeight());
@@ -122,11 +124,16 @@ public class GameScreen implements Screen {
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = font24;
 
-        score = new Label("Score: " + mapManager.getScore(), labelStyle);
-        score.setSize(Gdx.graphics.getWidth(), mapManager.getTileSize());
-        score.setAlignment(Align.center);
-        score.setY(mapManager.getScreenHeight() - mapManager.getTileSize());
-        stage.addActor(score);
+        coins = new Label("Coins: " + GameManager.getCoins(), labelStyle);
+        coins.setSize(Gdx.graphics.getWidth(), mapManager.getTileSize());
+        coins.setPosition(mapManager.getScreenWidth()/2+ 3*mapManager.getTileSize(),mapManager.getScreenHeight() - mapManager.getTileSize());
+        stage.addActor(coins);
+
+        level = new Label("Level: " + GameManager.getLevel(), labelStyle);
+        level.setSize(Gdx.graphics.getWidth(), mapManager.getTileSize());
+        level.setAlignment(Align.center);
+        level.setY(mapManager.getScreenHeight() - mapManager.getTileSize());
+        stage.addActor(level);
 
         Gdx.input.setInputProcessor(new SimpleDirectionGestureDetector(new SimpleDirectionGestureDetector.DirectionListener() {
 
@@ -184,7 +191,9 @@ public class GameScreen implements Screen {
         weaponBtn.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if(GameManager.getWeapons()>0)
                 robber.highlightTargets(stage);
+
             }
 
             @Override
@@ -194,7 +203,7 @@ public class GameScreen implements Screen {
             }
         });
         stage.addActor(weaponBtn);
-        weaponCount = new Label("" + mapManager.getWeaponCount(), labelStyle);
+        weaponCount = new Label("" + GameManager.getWeapons(), labelStyle);
         weaponCount.setPosition(mapManager.getScreenWidth() - mapManager.getTileSize(), mapManager.getTileSize() * 0.50f);
         stage.addActor(weaponCount);
 
@@ -263,19 +272,24 @@ public class GameScreen implements Screen {
         charRect.y = pos.getY() * mapManager.getTileSize();
     }
 
-    private void updateScore() {
-        score.setText("Score: " + mapManager.getScore());
+    private void updateCoins() {
+        coins.setText("Coins: " + GameManager.getCoins());
     }
 
     private void updateWeaponCount() {
-        weaponCount.setText("" + mapManager.getWeaponCount());
+        weaponCount.setText("" + GameManager.getWeapons());
+    }
+
+    private void updateLevel() {
+        level.setText("Level: " + GameManager.getLevel());
     }
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
-        updateScore();
+        updateCoins();
         updateWeaponCount();
+        updateLevel();
 
         if (!isGameEnded) {
             MOVES move = getMove();

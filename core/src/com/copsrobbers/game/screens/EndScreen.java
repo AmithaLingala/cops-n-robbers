@@ -10,23 +10,25 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.copsrobbers.game.CopsAndRobbersV1;
-import com.copsrobbers.game.MapManager;
+import com.copsrobbers.game.GameManager;
 
 public class EndScreen implements Screen {
-    private Stage stage;
-    private Game game;
+    private final Stage stage;
+    private final Game game;
 
     public EndScreen(Game aGame) {
         game = aGame;
         stage = new Stage(new ScreenViewport());
 
         TextButton playButton = new TextButton("Retry", CopsAndRobbersV1.gameSkin);
-        playButton.setWidth(Gdx.graphics.getWidth()/2);
-        playButton.setPosition(Gdx.graphics.getWidth()/2-playButton.getWidth()/2,Gdx.graphics.getHeight()/2-playButton.getHeight()/2);
+        playButton.setWidth(Gdx.graphics.getWidth()/2.0f);
+        playButton.setPosition(Gdx.graphics.getWidth()/2.0f-playButton.getWidth()/2,Gdx.graphics.getHeight()/2.0f-playButton.getHeight()/2);
         playButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-                MapManager.obtain().setScore(0);
+                GameManager.setCoins(0);
+                GameManager.setLevel(1);
+                GameManager.setWeapons(0);
                 game.setScreen(new GameScreen(game));
             }
             @Override
