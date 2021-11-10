@@ -1,11 +1,33 @@
 package com.copsrobbers.game.characters;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.copsrobbers.game.MapManager;
 import com.copsrobbers.game.screens.GameScreen;
 
 public class Character {
-    float x;
-    float y;
+    private float x;
+    private float y;
+    private float width;
+    private float height;
+    private MapManager mapManager;
+
+    public MapManager getMapManager() {
+        return mapManager;
+    }
+
+    public void setMapManager(MapManager mapManager) {
+        this.mapManager = mapManager;
+    }
+
+    public Texture getCharImg() {
+        return charImg;
+    }
+
+    public void setCharImg(Texture charImg) {
+        this.charImg = charImg;
+    }
+
+    private Texture charImg;
 
     public float getX() {
         return x;
@@ -39,9 +61,7 @@ public class Character {
         this.height = height;
     }
 
-    float width;
-    float height;
-    MapManager mapManager;
+
     public Character(Rectangle bounds)
     {
         this.x = bounds.x;

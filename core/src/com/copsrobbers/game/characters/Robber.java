@@ -1,5 +1,7 @@
 package com.copsrobbers.game.characters;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -13,6 +15,7 @@ import com.copsrobbers.game.overlay.TiledMapActor;
 import com.copsrobbers.game.screens.GameScreen;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Robber extends Character {
     private LevelListener ll;
@@ -24,8 +27,10 @@ public class Robber extends Character {
         this.ll = ll;
         this.neighbours = new ArrayList<>();
         this.actors = new ArrayList<>();
-
+        Texture robberImg = new Texture(Gdx.files.internal("robber_walk.PNG"));
+        setCharImg(robberImg);
     }
+
     public void collectItem(){
 
     }
@@ -35,30 +40,30 @@ public class Robber extends Character {
         super.update(move);
         clearTargets();
         ArrayList<Item> tempItems = new ArrayList<>();
-        for (Item item: mapManager.getItems()) {
+        for (Item item: getMapManager().getItems()) {
             if(item.isCollided(this)){
                 item.collect();
                 tempItems.add(item);
             }
         }
         for (Item item: tempItems) {
-            mapManager.getItems().remove(item);
+            getMapManager().getItems().remove(item);
         }
         tryEscape();
     }
     public void tryEscape(){
-        Rectangle gate = mapManager.getGate();
-        if(gate.x == this.x && gate.y == this.y){
+        Rectangle gate = getMapManager().getGate();
+        if(gate.x == this.getX() && gate.y == this.getY()){
             ll.nextLevel();
         }
     }
 
-    public void highlightTargets(Stage stage) {
+    public void highlightTargets(Stage stage, List<Cop> cops) {
         clearTargets();
-        int mapWidth = (int) mapManager.getMapWidth();
-        int mapHeight = (int) mapManager.getMapHeight();
-        int x = (int) (this.getX()/ mapManager.getTileSize());
-        int y = (int) (this.getY()/ mapManager.getTileSize());
+        int mapWidth = (int) getMapManager().getMapWidth();
+        int mapHeight = (int) getMapManager().getMapHeight();
+        int x = (int) (this.getX()/ getMapManager().getTileSize());
+        int y = (int) (this.getY()/ getMapManager().getTileSize());
 
         if(x+1< mapWidth){
             neighbours.add(new CellModel((x + 1) , y));
@@ -74,12 +79,17 @@ public class Robber extends Character {
         }
         for(CellModel cell:neighbours) {
             updateCellType(cell);
-            mapManager.highlightTile(cell,true);
-            TiledMapActor actor = mapManager.setEvent(cell.getRow(),cell.getColumn(),mapManager.getLayer(cell),stage,new ClickListener(){
+            getMapManager().highlightTile(cell,true);
+            TiledMapActor actor = getMapManager().setEvent(cell.getRow(),cell.getColumn(),getMapManager().getLayer(cell),stage,new ClickListener(){
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     super.clicked(event, x, y);
-                    mapManager.updateTileType(cell, MapManager.Layers.BACKGROUND);
+                    getMapManager().updateTileType(cell, MapManager.Layers.BACKGROUND);
+                    for(Cop cop: cops){
+                        if(cop.getX()/getMapManager().getTileSize()==cell.getRow() && cop.getY()/getMapManager().getTileSize()==cell.getColumn()){
+                            cop.freezeCop();
+                        }
+                    }
                     clearTargets();
                     GameManager.updateWeapons(-1);
                 }
@@ -91,7 +101,7 @@ public class Robber extends Character {
     public void clearTargets(){
         for(CellModel cell:neighbours) {
             updateCellType(cell);
-            mapManager.highlightTile(cell,false);
+            getMapManager().highlightTile(cell,false);
         }
         for (TiledMapActor actor:actors){
             actor.clear();
@@ -102,8 +112,8 @@ public class Robber extends Character {
     private void updateCellType(CellModel cell){
         int x = cell.getRow();
         int y = cell.getColumn();
-        cell.setBox(mapManager.hasObstacle(x,y));
-        cell.setWall(mapManager.hasWall(x,y));
+        cell.setBox(getMapManager().hasObstacle(x,y));
+        cell.setWall(getMapManager().hasWall(x,y));
     }
 
 }

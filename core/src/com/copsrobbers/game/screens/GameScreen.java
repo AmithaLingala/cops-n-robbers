@@ -47,8 +47,6 @@ public class GameScreen implements Screen {
     private OrthogonalTiledMapRenderer renderer;
     private OrthographicCamera camera;
     private SpriteBatch batch;
-    private Texture robberImg;
-    private Texture copImg;
     private Robber robber;
     private List<Cop> cops;
     private boolean isGameEnded = false;
@@ -72,9 +70,6 @@ public class GameScreen implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, mapManager.getScreenWidth(), mapManager.getScreenHeight());
         camera.update();
-
-        robberImg = new Texture(Gdx.files.internal("robber_walk.PNG"));
-        copImg = new Texture(Gdx.files.internal("cop_walk.png"));
 
         batch = new SpriteBatch();
         Rectangle robberRect = new Rectangle();
@@ -192,7 +187,7 @@ public class GameScreen implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 if(GameManager.getWeapons()>0)
-                robber.highlightTargets(stage);
+                robber.highlightTargets(stage,cops);
 
             }
 
@@ -308,9 +303,9 @@ public class GameScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
-        batch.draw(robberImg, robber.getX(), robber.getY(), robber.getWidth(), robber.getHeight());
+        batch.draw(robber.getCharImg(), robber.getX(), robber.getY(), robber.getWidth(), robber.getHeight());
         for (Cop cop : cops) {
-            batch.draw(copImg, cop.getX(), cop.getY(), cop.getWidth(), cop.getHeight());
+            batch.draw(cop.getCharImg(), cop.getX(), cop.getY(), cop.getWidth(), cop.getHeight());
         }
         for (Item item : mapManager.getItems()) {
             batch.draw(item.getRegion(Gdx.graphics.getDeltaTime()), item.getX(), item.getY(), item.getWidth(), item.getHeight());
@@ -365,7 +360,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        robberImg.dispose();
         batch.dispose();
 
     }
