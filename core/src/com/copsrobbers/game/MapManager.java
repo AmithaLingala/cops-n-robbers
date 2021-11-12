@@ -1,7 +1,6 @@
 package com.copsrobbers.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
@@ -10,7 +9,6 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.copsrobbers.game.algorithm.CellModel;
@@ -24,15 +22,111 @@ public class MapManager {
     private static MapManager instance;
     private final ArrayList<Item> items;
     private TiledMap map;
-    private float tileSize;
-    private float screenWidth;
-    private float screenHeight;
+    private int tileWidth;
+    private int tileHeight;
+    private int screenWidth;
+    private int screenHeight;
     private float mapWidth;
     private float mapHeight;
     private Rectangle gate;
+    private int rowTileCount;
+    private int columnTileCount;
+    private int texturesize = 32;
+
+    public int getTileWidth() {
+        return tileWidth;
+    }
+
+    public void setTileWidth(int tileWidth) {
+        this.tileWidth = tileWidth;
+    }
+
+    public int getTileHeight() {
+        return tileHeight;
+    }
+
+    public void setTileHeight(int tileHeight) {
+        this.tileHeight = tileHeight;
+    }
+
+    public int getTexturesize() {
+        return texturesize;
+    }
+
+    public int getRowTileCount() {
+        return rowTileCount;
+    }
+
+    public void setRowTileCount(int rowTileCount) {
+        this.rowTileCount = rowTileCount;
+    }
+
+    public int getColumnTileCount() {
+        return columnTileCount;
+    }
+
+    public void setColumnTileCount(int columnTileCount) {
+        this.columnTileCount = columnTileCount;
+    }
+
+    public TiledMap getMap() {
+        return map;
+    }
+
+    private void setMap(TiledMap map) {
+        this.map = map;
+    }
+
+    public int getScreenWidth() {
+        return screenWidth;
+    }
+
+    private void setScreenWidth(int screenWidth) {
+        this.screenWidth = screenWidth;
+    }
+
+    public int getScreenHeight() {
+        return screenHeight;
+    }
+
+    private void setScreenHeight(int screenHeight) {
+        this.screenHeight = screenHeight;
+    }
+
+    public float getMapWidth() {
+        return mapWidth;
+    }
+
+    private void setMapWidth(float mapWidth) {
+        this.mapWidth = mapWidth;
+    }
+
+    public float getMapHeight() {
+        return mapHeight;
+    }
+
+    private void setMapHeight(float mapHeight) {
+        this.mapHeight = mapHeight;
+    }
+
+    public Rectangle getGate() {
+        return gate;
+    }
+
+    public void setGate(Rectangle gate) {
+        this.gate = gate;
+        this.gate.x *= tileWidth;
+        this.gate.y *= tileHeight;
+    }
 
     public MapManager() {
         items = new ArrayList<>();
+        this.setRowTileCount(30);
+        this.setColumnTileCount(30);
+        this.setScreenWidth(Gdx.graphics.getWidth());
+        this.setScreenHeight(Gdx.graphics.getHeight());
+        this.setTileHeight((int)getScreenHeight()/getColumnTileCount());
+        this.setTileWidth((int)getScreenWidth()/getRowTileCount());
     }
 
     public static MapManager initialize() {
@@ -48,35 +142,30 @@ public class MapManager {
     public void init(TiledMap map) {
 
         this.setMap(map);
-        this.setScreenWidth(Gdx.graphics.getWidth());
-        this.setScreenHeight(Gdx.graphics.getHeight());
+
         TiledMapTileLayer layer = getLayer(Layers.BACKGROUND);
-        this.setTileSize(layer.getTileWidth());
         this.setMapWidth(layer.getWidth());
         this.setMapHeight(layer.getHeight());
 
     }
 
     public TiledMap generate(int levelNumber) {
-        int tileWidth = 32;
-        int tileHeight = 32;
-        int screenWidth = Gdx.graphics.getWidth();
-        int screenHeight = Gdx.graphics.getHeight();
-        CellModel[][] cells = new CellModel[screenWidth / tileWidth][screenHeight / tileHeight];
+
+        CellModel[][] cells = new CellModel[getRowTileCount()][getColumnTileCount()];
         LevelGenerator level = new LevelGenerator(cells);
         level.generate(levelNumber);
         TiledMap map = new TiledMap();
         MapLayers layers = map.getLayers();
-        TiledMapTileLayer background = new TiledMapTileLayer(screenWidth, screenHeight, tileWidth, tileHeight);
-        TiledMapTileLayer walls = new TiledMapTileLayer(screenWidth, screenHeight, tileWidth, tileHeight);
-        TiledMapTileLayer obstacles = new TiledMapTileLayer(screenWidth, screenHeight, tileWidth, tileHeight);
+        TiledMapTileLayer background = new TiledMapTileLayer(getScreenWidth(), getScreenHeight(), getTileWidth(), getTileHeight());
+        TiledMapTileLayer walls = new TiledMapTileLayer(getScreenWidth(), getScreenHeight(), getTileWidth(), getTileHeight());
+        TiledMapTileLayer obstacles = new TiledMapTileLayer(getScreenWidth(), getScreenHeight(), getTileWidth(), getTileHeight());
 
         background.setName(Layers.BACKGROUND.getType());
         walls.setName(Layers.WALLS.getType());
         obstacles.setName(Layers.OBSTACLES.getType());
 
         Texture tiles = new Texture(Gdx.files.internal("textures.png"));
-        TextureRegion[][] textureRegions = TextureRegion.split(tiles, tileWidth, tileHeight);
+        TextureRegion[][] textureRegions = TextureRegion.split(tiles, getTexturesize(), getTexturesize());
         Rectangle gate = new Rectangle();
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[0].length; j++) {
@@ -106,66 +195,6 @@ public class MapManager {
         return map;
     }
 
-    public TiledMap getMap() {
-        return map;
-    }
-
-    private void setMap(TiledMap map) {
-        this.map = map;
-    }
-
-    public float getTileSize() {
-        return tileSize;
-    }
-
-    private void setTileSize(float tileSize) {
-        this.tileSize = tileSize;
-    }
-
-    public float getScreenWidth() {
-        return screenWidth;
-    }
-
-    private void setScreenWidth(float screenWidth) {
-        this.screenWidth = screenWidth;
-    }
-
-    public float getScreenHeight() {
-        return screenHeight;
-    }
-
-    private void setScreenHeight(float screenHeight) {
-        this.screenHeight = screenHeight;
-    }
-
-    public float getMapWidth() {
-        return mapWidth;
-    }
-
-    private void setMapWidth(float mapWidth) {
-        this.mapWidth = mapWidth;
-    }
-
-    public float getMapHeight() {
-        return mapHeight;
-    }
-
-    private void setMapHeight(float mapHeight) {
-        this.mapHeight = mapHeight;
-    }
-
-    public Rectangle getGate() {
-        return gate;
-    }
-
-    public void setGate(Rectangle gate) {
-        this.gate = gate;
-        this.gate.x *= tileSize;
-        this.gate.y *= tileSize;
-    }
-
-
-
     public ArrayList<Item> getItems() {
         return items;
     }
@@ -193,7 +222,7 @@ public class MapManager {
         TiledMapTileLayer obstacle = getLayer(Layers.OBSTACLES);
         TiledMapTileLayer background = getLayer(Layers.BACKGROUND);
         Texture tiles = new Texture(Gdx.files.internal("textures.png"));
-        TextureRegion[][] textureRegions = TextureRegion.split(tiles, (int) getTileSize(), (int) getTileSize());
+        TextureRegion[][] textureRegions = TextureRegion.split(tiles, getTexturesize(),getTexturesize());
         int row = highlight ? 1 : 0;
         if (!tile.isWall() && !tile.isBox()) {
             TiledMapTileLayer.Cell cell = background.getCell(tile.getRow(), tile.getColumn());
@@ -205,14 +234,14 @@ public class MapManager {
     }
 
     public void updateTileType(CellModel tile, Layers layer) {
-        if(tile.isWall()){
+        if (tile.isWall()) {
             return;
         }
         TiledMapTileLayer tileLayer = getLayer(tile);
         tileLayer.setCell(tile.getRow(), tile.getColumn(), null);
         TiledMapTileLayer newLayer = getLayer(layer);
         Texture tiles = new Texture(Gdx.files.internal("textures.png"));
-        TextureRegion[][] textureRegions = TextureRegion.split(tiles, 32, 32);
+        TextureRegion[][] textureRegions = TextureRegion.split(tiles, getTexturesize(), getTexturesize());
         TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
         cell.setTile(new StaticTiledMapTile(textureRegions[0][layer.ordinal()]));
         newLayer.setCell(tile.getRow(), tile.getColumn(), cell);

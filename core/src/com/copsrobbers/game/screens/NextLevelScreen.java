@@ -53,14 +53,14 @@ public class NextLevelScreen implements Screen {
         MapManager mapManager = MapManager.obtain();
 
         Label coins = new Label("Coins: "+ GameManager.getCoins(),labelStyle);
-        coins.setSize(Gdx.graphics.getWidth(), mapManager.getTileSize());
+        coins.setSize(Gdx.graphics.getWidth(), mapManager.getTileHeight());
         coins.setAlignment(Align.center);
-        coins.setY(mapManager.getScreenHeight()- 2*mapManager.getTileSize());
+        coins.setY(mapManager.getScreenHeight()- 2*mapManager.getTileHeight());
 
         Label weapons = new Label("Weapons: "+ GameManager.getWeapons(),labelStyle);
-        weapons.setSize(Gdx.graphics.getWidth(), mapManager.getTileSize());
+        weapons.setSize(Gdx.graphics.getWidth(), mapManager.getTileHeight());
         weapons.setAlignment(Align.center);
-        weapons.setY(mapManager.getScreenHeight()- 3*mapManager.getTileSize());
+        weapons.setY(mapManager.getScreenHeight()- 3*mapManager.getTileHeight());
 
         stage.addActor(coins);
         stage.addActor(weapons);

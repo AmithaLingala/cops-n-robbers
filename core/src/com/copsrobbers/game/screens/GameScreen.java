@@ -68,15 +68,15 @@ public class GameScreen implements Screen {
         TiledMap map = mapManager.generate(GameManager.getLevel());
         renderer = new OrthogonalTiledMapRenderer(map, 1);
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, mapManager.getScreenWidth(), mapManager.getScreenHeight());
+        camera.setToOrtho(false, mapManager.getScreenWidth(), mapManager.getMapHeight());
         camera.update();
 
         batch = new SpriteBatch();
         Rectangle robberRect = new Rectangle();
         setRandomPos(map, robberRect, AREA.MIDDLE);
 
-        robberRect.width = mapManager.getTileSize();
-        robberRect.height = mapManager.getTileSize();
+        robberRect.width = mapManager.getTileWidth();
+        robberRect.height = mapManager.getTileHeight();
 
         robber = new Robber(robberRect, () -> game.setScreen(new NextLevelScreen(game)));
 
@@ -84,8 +84,8 @@ public class GameScreen implements Screen {
         for (int i = 0; i < copCount; i++) {
             Rectangle copRect = new Rectangle();
             setRandomPos(map, copRect, AREA.values()[i]);
-            copRect.width = mapManager.getTileSize();
-            copRect.height = mapManager.getTileSize();
+            copRect.width = mapManager.getTileWidth();
+            copRect.height = mapManager.getTileHeight();
             Cop cop = new Cop(copRect, () -> {
                 isGameEnded = true;
                 game.setScreen(new EndScreen(game));
@@ -95,16 +95,16 @@ public class GameScreen implements Screen {
         }
         Rectangle coinRect = new Rectangle();
         setRandomPos(map, coinRect, AREA.BOTTOM_RIGHT);
-        coinRect.width = mapManager.getTileSize();
-        coinRect.height = mapManager.getTileSize();
+        coinRect.width = mapManager.getTileWidth();
+        coinRect.height = mapManager.getTileHeight();
         Coin coin = new Coin(coinRect);
         mapManager.addItem(coin);
 
 
         Rectangle weaponRect = new Rectangle();
         setRandomPos(map, weaponRect, AREA.BOTTOM_LEFT);
-        weaponRect.width = mapManager.getTileSize();
-        weaponRect.height = mapManager.getTileSize();
+        weaponRect.width = mapManager.getTileWidth();
+        weaponRect.height = mapManager.getTileHeight();
         Weapon weapon = new Weapon(weaponRect);
         mapManager.addItem(weapon);
 
@@ -120,14 +120,14 @@ public class GameScreen implements Screen {
         labelStyle.font = font24;
 
         coins = new Label("Coins: " + GameManager.getCoins(), labelStyle);
-        coins.setSize(Gdx.graphics.getWidth(), mapManager.getTileSize());
-        coins.setPosition(mapManager.getScreenWidth()/2+ 3*mapManager.getTileSize(),mapManager.getScreenHeight() - mapManager.getTileSize());
+        coins.setSize(Gdx.graphics.getWidth(), mapManager.getTileHeight());
+        coins.setPosition(mapManager.getScreenWidth() / 2 + 3 * mapManager.getTileWidth(), mapManager.getScreenHeight() - mapManager.getTileHeight());
         stage.addActor(coins);
 
         level = new Label("Level: " + GameManager.getLevel(), labelStyle);
-        level.setSize(Gdx.graphics.getWidth(), mapManager.getTileSize());
+        level.setSize(Gdx.graphics.getWidth(), mapManager.getTileHeight());
         level.setAlignment(Align.center);
-        level.setY(mapManager.getScreenHeight() - mapManager.getTileSize());
+        level.setY(mapManager.getScreenHeight() - mapManager.getTileHeight());
         stage.addActor(level);
 
         Gdx.input.setInputProcessor(new SimpleDirectionGestureDetector(new SimpleDirectionGestureDetector.DirectionListener() {
@@ -136,6 +136,7 @@ public class GameScreen implements Screen {
             public void onUp() {
                 if (!isGameEnded) {
                     robber.update(MOVES.UP);
+                    robber.setWalking(true);
                     for (Cop cop : cops) {
                         cop.update(robber);
                     }
@@ -147,6 +148,7 @@ public class GameScreen implements Screen {
             public void onRight() {
                 if (!isGameEnded) {
                     robber.update(MOVES.RIGHT);
+                    robber.setWalking(true);
                     for (Cop cop : cops) {
                         cop.update(robber);
                     }
@@ -157,6 +159,7 @@ public class GameScreen implements Screen {
             public void onLeft() {
                 if (!isGameEnded) {
                     robber.update(MOVES.LEFT);
+                    robber.setWalking(true);
                     for (Cop cop : cops) {
                         cop.update(robber);
                     }
@@ -167,6 +170,7 @@ public class GameScreen implements Screen {
             public void onDown() {
                 if (!isGameEnded) {
                     robber.update(MOVES.DOWN);
+                    robber.setWalking(true);
                     for (Cop cop : cops) {
                         cop.update(robber);
                     }
@@ -176,18 +180,18 @@ public class GameScreen implements Screen {
         }));
 
         ImageButton weaponBtn = new ImageButton(CopsAndRobbersV1.gameSkin);
-        weaponBtn.setSize(mapManager.getTileSize(), mapManager.getTileSize());
+        weaponBtn.setSize(mapManager.getTileWidth(), mapManager.getTileHeight());
         Texture weaponTexture = new Texture("EMP.png");
         TextureRegion[] regions = TextureRegion.split(weaponTexture, 32, 32)[0];
 
         weaponBtn.getStyle().imageUp = new TextureRegionDrawable(regions[0]);
         weaponBtn.getStyle().imageDown = new TextureRegionDrawable(regions[1]);
-        weaponBtn.setPosition(mapManager.getScreenWidth() - 2 * mapManager.getTileSize(), 0);
+        weaponBtn.setPosition(mapManager.getScreenWidth() - 2 * mapManager.getTileWidth(), 0);
         weaponBtn.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if(GameManager.getWeapons()>0)
-                robber.highlightTargets(stage,cops);
+                if (GameManager.getWeapons() > 0)
+                    robber.highlightTargets(stage, cops);
 
             }
 
@@ -199,7 +203,7 @@ public class GameScreen implements Screen {
         });
         stage.addActor(weaponBtn);
         weaponCount = new Label("" + GameManager.getWeapons(), labelStyle);
-        weaponCount.setPosition(mapManager.getScreenWidth() - mapManager.getTileSize(), mapManager.getTileSize() * 0.50f);
+        weaponCount.setPosition(mapManager.getScreenWidth() - mapManager.getTileWidth(), mapManager.getTileHeight() * 0.50f);
         stage.addActor(weaponCount);
 
 
@@ -263,8 +267,8 @@ public class GameScreen implements Screen {
         }
 
         Node pos = cells.get(random.nextInt(cells.size()));
-        charRect.x = pos.getX() * mapManager.getTileSize();
-        charRect.y = pos.getY() * mapManager.getTileSize();
+        charRect.x = pos.getX() * mapManager.getTileWidth();
+        charRect.y = pos.getY() * mapManager.getTileHeight();
     }
 
     private void updateCoins() {
@@ -282,6 +286,9 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
+//        Vector3 v3 = new Vector3();
+//        v3.set(robber.getX(),robber.getY(),0);
+//        camera.position.lerp(v3,0.01f);
         updateCoins();
         updateWeaponCount();
         updateLevel();
@@ -299,11 +306,30 @@ public class GameScreen implements Screen {
 
         renderer.setView(camera);
         renderer.render();
+        // Commeting camera movement with player
+//        if (robber.getX() > mapManager.getMapWidth()- 2*mapManager.getTileSize()) {
+//            camera.position.x = mapManager.getMapWidth();
+//        } else
+//            if (robber.getX() > 400) {
+//            camera.position.x = 400;
+//        } else {
+//           camera.position.x = robber.getX();
+//        }
+//        if (robber.getY() < mapManager.getMapHeight()) {
+//            camera.position.y = mapManager.getMapHeight();
+//        } else if (robber.getY() > 400) {
+//            camera.position.y = 400;
+//        } else {
+//           camera.position.y = robber.getY();
+//        }
+//          camera.position.y = utils.getScreenWidth()/2 - (utils.getMapHeight()*utils.getScale())/2;
+
+
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
-        batch.draw(robber.getCharImg(), robber.getX(), robber.getY(), robber.getWidth(), robber.getHeight());
+        batch.draw(robber.getRegion(Gdx.graphics.getDeltaTime()), robber.getX(), robber.getY(), robber.getWidth(), robber.getHeight());
         for (Cop cop : cops) {
             batch.draw(cop.getCharImg(), cop.getX(), cop.getY(), cop.getWidth(), cop.getHeight());
         }

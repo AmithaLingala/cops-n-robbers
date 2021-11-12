@@ -1,5 +1,7 @@
 package com.copsrobbers.game.characters;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.copsrobbers.game.MapManager;
 import com.copsrobbers.game.screens.GameScreen;
@@ -10,7 +12,31 @@ public class Character {
     private float width;
     private float height;
     private MapManager mapManager;
+    private Animation<TextureRegion> walk;
+    private float stateTime;
+    private boolean isWalking = false;
 
+    public boolean isWalking() {
+        return isWalking;
+    }
+
+    public void setWalking(boolean walking) {
+        isWalking = walking;
+    }
+
+    public void setWalk(TextureRegion[] regions) {
+        walk = new Animation<>(0.10f, regions);
+        walk.setPlayMode(Animation.PlayMode.LOOP);
+    }
+    public TextureRegion getRegion(float stateTime){
+        if(isWalking()) {
+            this.stateTime += stateTime;
+            return walk.getKeyFrame(this.stateTime);
+        }
+        else{
+            return walk.getKeyFrame(stateTime);
+        }
+    }
     public MapManager getMapManager() {
         return mapManager;
     }
