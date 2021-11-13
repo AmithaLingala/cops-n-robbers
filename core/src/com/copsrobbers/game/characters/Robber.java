@@ -1,29 +1,29 @@
 package com.copsrobbers.game.characters;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.copsrobbers.game.GameManager;
-import com.copsrobbers.game.MapManager;
+import com.copsrobbers.game.managers.AssetManager;
+import com.copsrobbers.game.managers.GameManager;
+import com.copsrobbers.game.managers.MapManager;
 import com.copsrobbers.game.algorithm.CellModel;
 import com.copsrobbers.game.items.Item;
 import com.copsrobbers.game.listeners.LevelListener;
-import com.copsrobbers.game.overlay.TiledMapActor;
+import com.copsrobbers.game.ui.TiledMapActor;
 import com.copsrobbers.game.screens.GameScreen;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Robber extends Character {
+    private final LevelListener ll;
     ArrayList<CellModel> neighbours;
     ArrayList<TiledMapActor> actors;
-    private final LevelListener ll;
-
     public Robber(Rectangle bounds, LevelListener ll) {
         super(bounds);
         this.ll = ll;
@@ -32,7 +32,6 @@ public class Robber extends Character {
         Texture robberImg = new Texture(Gdx.files.internal("Spritesheet.PNG"));
         TextureRegion[] regions = TextureRegion.split(robberImg, 88, 88)[0];
         setWalk(regions);
-        //setCharImg(robberImg);
     }
 
     @Override
@@ -42,6 +41,7 @@ public class Robber extends Character {
         ArrayList<Item> tempItems = new ArrayList<>();
         for (Item item : getMapManager().getItems()) {
             if (item.isCollided(this)) {
+                AssetManager.obtain().playItemCollect();
                 item.collect();
                 tempItems.add(item);
             }
@@ -91,6 +91,7 @@ public class Robber extends Character {
                             cop.freezeCop();
                         }
                     }
+                    AssetManager.obtain().playExplosion();
                     clearTargets();
                     GameManager.updateWeapons(-1);
                 }

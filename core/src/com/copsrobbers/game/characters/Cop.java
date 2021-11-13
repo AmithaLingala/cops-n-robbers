@@ -11,7 +11,7 @@ import java.util.LinkedList;
 
 
 public class Cop extends Character {
-private GameListener gl;
+private final GameListener gl;
 private boolean freeze = false;
     public Cop(Rectangle bounds, GameListener gl){
         super(bounds);
@@ -34,8 +34,14 @@ private boolean freeze = false;
     private LinkedList<Integer> catchRobber( Robber robber){
         GraphManager G = new GraphManager();
         ArrayList<ArrayList<Integer>> adj = G.generateGraph();
-        int copPos = (int) (((this.getX() /this.getWidth() ) * (this.getMapManager().getMapWidth()/this.getMapManager().getTileWidth())) + (this.getY()/this.getHeight()));
-        int robberPos = (int) (((robber.getX() /robber.getWidth() ) * (this.getMapManager().getMapWidth()/this.getMapManager().getTileWidth())) + (robber.getY()/robber.getHeight()));
+
+        int x = (int)this.getX() / this.getMapManager().getTextureSize();
+        int y = (int)this.getY() / this.getMapManager().getTextureSize();
+        int copPos = (x * this.getMapManager().getColumnTileCount()) + y;
+
+        int rx = (int)robber.getX() / this.getMapManager().getTextureSize();
+        int ry = (int)robber.getY() / this.getMapManager().getTextureSize();
+        int robberPos = (rx * this.getMapManager().getColumnTileCount()) + ry;
 
         return G.printShortestDistance(adj,copPos,robberPos);
     }
@@ -45,11 +51,11 @@ private boolean freeze = false;
             if (path.size() - 2 <= 0) {
                 gl.endGame();
             } else {
-                int x = (int) (path.get(path.size() - 2) / (this.getMapManager().getMapWidth() / this.getMapManager().getTileWidth()));
-                int y = (int) (path.get(path.size() - 2) % (this.getMapManager().getMapWidth() / this.getMapManager().getTileWidth()));
+                int x = path.get(path.size() - 2) / this.getMapManager().getColumnTileCount();
+                int y = path.get(path.size() - 2) % this.getMapManager().getColumnTileCount();
 
-                this.setX(x * this.getWidth());
-                this.setY(y * this.getHeight());
+                this.setX(x * this.getMapManager().getTileWidth());
+                this.setY(y * this.getMapManager().getTileHeight());
             }
         }
         unFreezeCop();

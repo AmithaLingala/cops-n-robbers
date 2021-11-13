@@ -38,7 +38,7 @@ public class LevelGenerator {
             for (int j = 0; j < cells[0].length; j++) {
 //               int x = random.nextInt(cells.length);
 //               int y = random.nextInt(cells[0].length);
-                boolean flag = random.nextInt(100) < level * 5;
+                boolean flag = random.nextInt(100) < level * 2;
                 //cells[i][j].setWall(flag); //set cell to path
                 cells[i][j].setBox(flag);
             }

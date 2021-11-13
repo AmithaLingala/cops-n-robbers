@@ -3,12 +3,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.copsrobbers.game.MapManager;
+import com.copsrobbers.game.managers.MapManager;
 import com.copsrobbers.game.screens.GameScreen;
 
 public class Character {
     private float x;
     private float y;
+
     private float width;
     private float height;
     private MapManager mapManager;
@@ -98,8 +99,8 @@ public class Character {
     }
     public void update(GameScreen.MOVES move){
 
-        int i = (int) Math.floor(this.x / this.width);
-        int j = (int) Math.floor(this.y / this.height);
+        int i = (int) Math.floor(this.x / this.getMapManager().getTileWidth());
+        int j = (int) Math.floor(this.y / this.getMapManager().getTileHeight());
         float curX = this.x;
         float curY = this.y;
         boolean canMove = false;
@@ -107,19 +108,19 @@ public class Character {
         switch (move) {
             case LEFT:
                 canMove = mapManager.canMove(i - 1, j);
-                this.x -= this.width;
+                this.x -= this.getMapManager().getTileWidth();
                 break;
             case RIGHT:
                 canMove = mapManager.canMove(i + 1, j);
-                this.x += this.width;
+                this.x += this.getMapManager().getTileWidth();
                 break;
             case UP:
                 canMove = mapManager.canMove(i, j + 1);
-                this.y += this.height;
+                this.y += this.getMapManager().getTileHeight();
                 break;
             case DOWN:
                 canMove = mapManager.canMove(i, j - 1);
-                this.y -= this.height;
+                this.y -= this.getMapManager().getTileHeight();
                 break;
         }
 
@@ -128,8 +129,8 @@ public class Character {
             this.y = curY;
         }
         else{
-            this.x = (float) (Math.floor(this.x / this.width) * this.width);
-            this.y = (float) (Math.floor(this.y / this.width) * this.width);
+            this.x = (float) (Math.floor(this.x / this.getMapManager().getTileWidth()) * this.getMapManager().getTileWidth());
+            this.y = (float) (Math.floor(this.y / this.getMapManager().getTileHeight()) * this.getMapManager().getTileHeight());
         }
 
     }

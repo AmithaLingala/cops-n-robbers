@@ -1,40 +1,28 @@
 package com.copsrobbers.game.algorithm;
 
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.copsrobbers.game.MapManager;
+import com.copsrobbers.game.managers.MapManager;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class GraphManager {
-    private final TiledMapTileLayer walls;
-    private final TiledMapTileLayer background;
-    private final int tileWidth;
-    private final int tileHeight;
     private final int mapWidth;
     private final int mapHeight;
-    private MapManager mapManager;
+    private final MapManager mapManager;
 
 
     public GraphManager() {
         mapManager = MapManager.obtain();
-        TiledMap map = mapManager.getMap();
-        walls = (TiledMapTileLayer) map.getLayers().get("walls");
-        background = (TiledMapTileLayer) map.getLayers().get("background");
-        tileWidth = walls.getTileWidth();
-        tileHeight = walls.getTileHeight();
-        mapWidth = background.getWidth()/tileWidth;
-        mapHeight = background.getHeight()/tileHeight;
-
-        }
+        mapWidth = mapManager.getRowTileCount();
+        mapHeight = mapManager.getColumnTileCount();
+    }
 
     public ArrayList<ArrayList<Integer>> generateGraph() {
-        ArrayList<ArrayList<Integer>> graph = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
 
         for (int row = 0; row < mapWidth; row++) {
-            for (int col = 0; col < mapWidth; col++) {
-                int current = (row * mapWidth) + col;
+            for (int col = 0; col < mapHeight; col++) {
+                int current = (row * mapHeight) + col;
                 graph.add(this.getNeighbours(current));
             }
 
@@ -44,37 +32,36 @@ public class GraphManager {
 
     private ArrayList<Integer> getNeighbours(Integer pos) {
         ArrayList<Integer> neighbours = new ArrayList<>();
-            int x = pos/ mapWidth;
-            int y = pos% mapWidth;
+            int x = pos/ mapHeight;
+            int y = pos% mapHeight;
 
         if(x+1< mapWidth && mapManager.canMove(x+1,y)){
-            neighbours.add(((x + 1) * mapWidth) + y);
+            neighbours.add(((x + 1) * mapHeight) + y);
         }
         if(x-1>=0 && mapManager.canMove(x-1,y)){
-            neighbours.add((x - 1) * mapWidth + y);
+            neighbours.add((x - 1) * mapHeight + y);
         }
         if(y+1<mapHeight && mapManager.canMove(x,y+1)){
-            neighbours.add(x * mapWidth + y + 1);
+            neighbours.add(x * mapHeight + y + 1);
         }
         if(y-1>=0 && mapManager.canMove(x,y-1)){
-            neighbours.add(x * mapWidth + (y - 1));
+            neighbours.add(x * mapHeight + (y - 1));
         }
         return neighbours;
     }
     public LinkedList<Integer> printShortestDistance(
             ArrayList<ArrayList<Integer>> adj,
-            int source, int dest)
-    {
+            int source, int dest) {
         // predecessor[i] array stores predecessor of
         // i and distance array stores distance of i
         // from s
 
         int v = adj.size();
-        int pred[] = new int[v];
-        int dist[] = new int[v];
-        LinkedList<Integer> path = new LinkedList<Integer>();
+        int[] pred = new int[v];
+        int[] dist = new int[v];
+        LinkedList<Integer> path = new LinkedList<>();
 
-        if (BFS(adj, source, dest, v, pred, dist) == false) {
+        if (!BFS(adj, source, dest, v, pred, dist)) {
             System.out.println("Given source and destination" +
                     "are not connected");
             return path;
@@ -94,23 +81,20 @@ public class GraphManager {
 
         // Print path
         System.out.println("Path is ::");
-//        for (int i = path.size() - 1; i >= 0; i--) {
-//          //  System.out.print(path.get(i)/(this.mapWidth/this.tileHeight) +" "+ path.get(i)%(this.mapWidth/this.tileHeight) + ", ");
-//        }
         return path;
     }
     private static boolean BFS(ArrayList<ArrayList<Integer>> adj, int src,
-                               int dest, int v, int pred[], int dist[])
+                               int dest, int v, int[] pred, int[] dist)
     {
         // a queue to maintain queue of vertices whose
         // adjacency list is to be scanned as per normal
         // BFS algorithm using LinkedList of Integer type
-        LinkedList<Integer> queue = new LinkedList<Integer>();
+        LinkedList<Integer> queue = new LinkedList<>();
 
         // boolean array visited[] which stores the
         // information whether ith vertex is reached
         // at least once in the Breadth first search
-        boolean visited[] = new boolean[v];
+        boolean[] visited = new boolean[v];
 
         // initially all vertices are unvisited
         // so v[i] for all i is false
@@ -132,7 +116,7 @@ public class GraphManager {
         while (!queue.isEmpty()) {
             int u = queue.remove();
             for (int i = 0; i < adj.get(u).size(); i++) {
-                if (visited[adj.get(u).get(i)] == false) {
+                if (!visited[adj.get(u).get(i)]) {
                     visited[adj.get(u).get(i)] = true;
                     dist[adj.get(u).get(i)] = dist[u] + 1;
                     pred[adj.get(u).get(i)] = u;
