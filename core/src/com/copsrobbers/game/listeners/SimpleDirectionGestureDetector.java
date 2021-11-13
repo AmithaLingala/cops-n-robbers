@@ -17,10 +17,10 @@ public class SimpleDirectionGestureDetector extends GestureDetector {
         super(new DirectionGestureListener(directionListener));
     }
 
-    private static class DirectionGestureListener extends GestureAdapter{
+    private static class DirectionGestureListener extends GestureAdapter {
         DirectionListener directionListener;
 
-        public DirectionGestureListener(DirectionListener directionListener){
+        public DirectionGestureListener(DirectionListener directionListener) {
             this.directionListener = directionListener;
         }
 
@@ -39,7 +39,7 @@ public class SimpleDirectionGestureDetector extends GestureDetector {
                     directionListener.onUp();
                 }
             }
-            return super.fling(velocityX, velocityY, button);
+            return true;
         }
 
     }

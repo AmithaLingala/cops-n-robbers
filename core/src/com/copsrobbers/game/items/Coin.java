@@ -4,7 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.copsrobbers.game.GameManager;
+import com.copsrobbers.game.managers.GameManager;
+import com.copsrobbers.game.managers.MapManager;
 
 public class Coin extends Item{
     private final int count;
@@ -14,7 +15,8 @@ public class Coin extends Item{
         super(bounds);
         this.count = count;
         Texture coinTexture = new Texture("Coins.png");
-        TextureRegion[] regions = TextureRegion.split(coinTexture, 32, 32)[0];
+        MapManager mapManager = MapManager.obtain();
+        TextureRegion[] regions = TextureRegion.split(coinTexture, mapManager.getTextureSize(), mapManager.getTextureSize())[0];
         spin = new Animation<>(0.10f, regions);
         spin.setPlayMode(Animation.PlayMode.LOOP);
     }

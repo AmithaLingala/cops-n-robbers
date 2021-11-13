@@ -1,9 +1,8 @@
 package com.copsrobbers.game.algorithm;
 
 public class Node {
-    private int x;
-    private int y;
-    private int index;
+    private final int x;
+    private final int y;
     public Node(int x, int y){
         this.x = x;
         this.y = y;

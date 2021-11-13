@@ -15,8 +15,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.copsrobbers.game.CopsAndRobbersV1;
-import com.copsrobbers.game.GameManager;
-import com.copsrobbers.game.MapManager;
+import com.copsrobbers.game.managers.AssetManager;
+import com.copsrobbers.game.managers.GameManager;
+import com.copsrobbers.game.managers.MapManager;
+import com.copsrobbers.game.ui.Components;
 
 public class NextLevelScreen implements Screen {
     private final Stage stage;
@@ -25,58 +27,50 @@ public class NextLevelScreen implements Screen {
     public NextLevelScreen(Game aGame) {
         game = aGame;
         stage = new Stage(new ScreenViewport());
-        int level = GameManager.getLevel()+1;
+        int level = GameManager.getLevel() + 1;
 
-        TextButton playButton = new TextButton("Go to level "+level, CopsAndRobbersV1.gameSkin);
-        playButton.setWidth(Gdx.graphics.getWidth()/2.0f);
-        playButton.setPosition(Gdx.graphics.getWidth()/2.0f-playButton.getWidth()/2,Gdx.graphics.getHeight()/2.0f-playButton.getHeight()/2);
-        playButton.addListener(new InputListener(){
+        TextButton playButton = new TextButton("Go to level " + level, CopsAndRobbersV1.gameSkin);
+        playButton.setWidth(Gdx.graphics.getWidth() * 0.5f);
+        playButton.setHeight(Gdx.graphics.getHeight() / 10f);
+        playButton.setPosition(Gdx.graphics.getWidth() * 0.5f - playButton.getWidth() * 0.5f, Gdx.graphics.getHeight() * 0.5f - playButton.getHeight() / 10f);
+        playButton.addListener(new InputListener() {
             @Override
-            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 GameManager.setLevel(level);
                 game.setScreen(new GameScreen(game));
             }
+
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Amble-Light.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 20;
-        parameter.color = Color.BLACK;
-        BitmapFont font24 = generator.generateFont(parameter); // font size 24 pixels
-        generator.dispose();
-
-        Label.LabelStyle labelStyle = new Label.LabelStyle();
-        labelStyle.font = font24;
         MapManager mapManager = MapManager.obtain();
 
-        Label coins = new Label("Coins: "+ GameManager.getCoins(),labelStyle);
-        coins.setSize(Gdx.graphics.getWidth(), mapManager.getTileSize());
+        Label coins = Components.createLabel("Coins: " + GameManager.getCoins(), 20);
+        coins.setSize(Gdx.graphics.getWidth(), mapManager.getTileHeight());
         coins.setAlignment(Align.center);
-        coins.setY(mapManager.getScreenHeight()- 2*mapManager.getTileSize());
+        coins.setY(mapManager.getScreenHeight() - 3 * mapManager.getTileHeight());
 
-        Label weapons = new Label("Weapons: "+ GameManager.getWeapons(),labelStyle);
-        weapons.setSize(Gdx.graphics.getWidth(), mapManager.getTileSize());
+        Label weapons = Components.createLabel("Weapons: " + GameManager.getWeapons(), 20);
+        weapons.setSize(Gdx.graphics.getWidth(), mapManager.getTileHeight());
         weapons.setAlignment(Align.center);
-        weapons.setY(mapManager.getScreenHeight()- 3*mapManager.getTileSize());
+        weapons.setY(mapManager.getScreenHeight() - 4 * mapManager.getTileHeight());
 
         stage.addActor(coins);
         stage.addActor(weapons);
         stage.addActor(playButton);
-
-
     }
 
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+        AssetManager.obtain().playComplete();
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act();
         stage.draw();
