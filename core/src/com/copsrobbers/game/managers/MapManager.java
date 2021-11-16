@@ -14,14 +14,17 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.copsrobbers.game.algorithm.CellModel;
 import com.copsrobbers.game.algorithm.LevelGenerator;
+import com.copsrobbers.game.characters.Cop;
 import com.copsrobbers.game.items.Item;
 import com.copsrobbers.game.ui.TiledMapActor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MapManager {
     private static MapManager instance;
     private final ArrayList<Item> items;
+    private final List<Cop> cops;
     private final int textureSize = 32;
     private final TiledMapTileSet tileSet;
     private TiledMap map;
@@ -37,6 +40,7 @@ public class MapManager {
 
     public MapManager() {
         items = new ArrayList<>();
+        cops = new ArrayList<>();
         int prefRows = 25; //TODO Provide a better scaling, may be floats would do the trick
         int scale = Gdx.graphics.getWidth() / textureSize / prefRows;
         if (scale == 0) {
@@ -170,11 +174,8 @@ public class MapManager {
 
     }
 
-    public TiledMap generate(int levelNumber) {
+    public TiledMap generate(CellModel[][] cells) {
 
-        CellModel[][] cells = new CellModel[getRowTileCount()][getColumnTileCount()];
-        LevelGenerator level = new LevelGenerator(cells);
-        level.generate(levelNumber);
         TiledMap map = new TiledMap();
         MapLayers layers = map.getLayers();
         TiledMapTileLayer background = new TiledMapTileLayer(getScreenWidth(), getScreenHeight(), getTileWidth(), getTileHeight());
@@ -233,11 +234,33 @@ public class MapManager {
         return !(hasWall(x, y) || hasObstacle(x, y));
     }
 
-
+    public boolean hasCop(int x, int y) {
+        for (Cop cop: cops) {
+            if(cop.getX() == x*this.getTileWidth() && cop.getY() == y *this.getTileHeight()){
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean hasItem(int x, int y) {
+        for (Item item: items) {
+            if(item.getX() == x*this.getTileWidth() && item.getY() == y *this.getTileHeight()){
+                return true;
+            }
+        }
+        return false;
+    }
     public void addItem(Item item) {
         items.add(item);
     }
 
+    public List<Cop> getCops() {
+        return cops;
+    }
+
+    public  void addCop(Cop cop){
+        cops.add(cop);
+    }
     public void highlightTile(CellModel tile, boolean highlight) {
         TiledMapTileLayer obstacle = getLayer(Layers.OBSTACLES);
         TiledMapTileLayer background = getLayer(Layers.BACKGROUND);

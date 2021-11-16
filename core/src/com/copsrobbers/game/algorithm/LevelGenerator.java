@@ -1,6 +1,18 @@
 package com.copsrobbers.game.algorithm;
 
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
+import com.copsrobbers.game.characters.Cop;
+import com.copsrobbers.game.characters.Robber;
+import com.copsrobbers.game.items.Coin;
+import com.copsrobbers.game.items.Item;
+import com.copsrobbers.game.items.Weapon;
+import com.copsrobbers.game.listeners.GameListener;
+import com.copsrobbers.game.listeners.LevelListener;
+import com.copsrobbers.game.managers.MapManager;
+import com.copsrobbers.game.screens.EndScreen;
+import com.copsrobbers.game.screens.GameScreen;
+import com.copsrobbers.game.screens.NextLevelScreen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +29,13 @@ public class LevelGenerator {
     private final CellModel[][] cells;
     private final Random random;
     private long delay = 0;
+    private MapManager mapManager;
+
 
     public LevelGenerator(CellModel[][] cells) {
         this.cells = cells;
         random = new Random();
+        mapManager = MapManager.obtain();
     }
 
     public void generate(int level) {
@@ -29,17 +44,13 @@ public class LevelGenerator {
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[0].length; j++) {
                 cells[i][j] = new CellModel(i, j, false);
-                //cell[j].setWall(true);
             }
         }
 
         //Pick a random cell
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[0].length; j++) {
-//               int x = random.nextInt(cells.length);
-//               int y = random.nextInt(cells[0].length);
                 boolean flag = random.nextInt(100) < level * 2;
-                //cells[i][j].setWall(flag); //set cell to path
                 cells[i][j].setBox(flag);
             }
         }
@@ -57,88 +68,107 @@ public class LevelGenerator {
         cells[(int) gate.x][(int) gate.y].setWall(false);
         cells[(int) gate.x][(int) gate.y].setGate(true);
 
-        //Compute cell frontier and add it to a frontier collection
-        //  Set<CellModel> frontierCells = new HashSet<>(frontierCellsOf(cells[x][y]));
-
-//        while (!frontierCells.isEmpty()){
-//
-//            //Pick a random cell from the frontier collection
-//            CellModel frontierCell;
-//            CellModel found = null;
-//            long toSkip = random.nextInt(frontierCells.size());
-//            for (CellModel cellModel : frontierCells) {
-//                if (toSkip > 0) {
-//                    toSkip--;
-//                    continue;
-//                }
-//                found = cellModel;
-//                break;
-//            }
-//            frontierCell = found;
-//
-//            //Get its neighbors: cells in distance 2 in state path (no wall)
-//            List<CellModel> frontierNeighbors =  passageCellsOf(frontierCell);
-//
-//            if(!frontierNeighbors.isEmpty()) {
-//                //Pick a random neighbor
-//                CellModel neighbor = frontierNeighbors.get(random.nextInt(frontierNeighbors.size()));
-//                //Connect the frontier cell with the neighbor
-//                connect(frontierCell, neighbor);
-//            }
-//
-//            //Compute the frontier cells of the chosen frontier cell and add them to the frontier collection
-//            frontierCells.addAll(frontierCellsOf(frontierCell));
-//            //Remove frontier cell from the frontier collection
-//            frontierCells.remove( frontierCell);
-////            try {
-////                Thread.sleep(delay);
-////            } catch (InterruptedException ex) { ex.printStackTrace();}
-//        }
     }
 
-    //Frontier cells: wall cells in a distance of 2
-    private List<CellModel> frontierCellsOf(CellModel cell) {
-
-        return cellsAround(cell, true);
+    public void generateItems(int level){
+        for(int i=0; i<level*2;i++){
+            Rectangle coinRect = new Rectangle();
+            setRandomPos(coinRect, GameScreen.AREA.values()[i%5]);
+            coinRect.width = mapManager.getTileWidth();
+            coinRect.height = mapManager.getTileHeight();
+            Coin coin = new Coin(coinRect);
+            mapManager.addItem(coin);
+        }
+        for(int i=0; i<level;i++){
+            Rectangle weaponRect = new Rectangle();
+            setRandomPos(weaponRect, GameScreen.AREA.values()[(i+2)%5]);
+            weaponRect.width = mapManager.getTileWidth();
+            weaponRect.height = mapManager.getTileHeight();
+            Weapon weapon = new Weapon(weaponRect);
+            mapManager.addItem(weapon);
+        }
     }
 
-    //Frontier cells: passage (no wall) cells in a distance of 2
-    private List<CellModel> passageCellsOf(CellModel cell) {
-
-        return cellsAround(cell, false);
+    public void generateCops(int copCount, GameListener gl) {
+        for (int i = 0; i < copCount; i++) {
+            Rectangle copRect = new Rectangle();
+            setRandomPos(copRect, GameScreen.AREA.values()[i]);
+            copRect.width = mapManager.getTileWidth();
+            copRect.height = mapManager.getTileHeight();
+            Cop cop = new Cop(copRect, gl);
+            mapManager.addCop(cop);
+        }
+    }
+    public Robber generateRobber(LevelListener ll){
+        Rectangle robberRect = new Rectangle();
+        robberRect.width = mapManager.getTileWidth();
+        robberRect.height = mapManager.getTileHeight();
+        setRandomPos(robberRect, GameScreen.AREA.MIDDLE);
+        return new Robber(robberRect,ll);
     }
 
-    private List<CellModel> cellsAround(CellModel cell, boolean isWall) {
+    private void setRandomPos(Rectangle charRect, GameScreen.AREA area) {
+        ArrayList<Node> cells = new ArrayList<>();
 
-        List<CellModel> frontier = new ArrayList<>();
-        for (int[] direction : DIRECTIONS) {
-            int newRow = cell.getRow() + direction[0];
-            int newCol = cell.getColumn() + direction[1];
-            if (isValidPosition(newRow, newCol) && cells[newRow][newCol].isWall() == isWall) {
-                frontier.add(cells[newRow][newCol]);
+        TiledMapTileLayer background = (TiledMapTileLayer) mapManager.getLayer(MapManager.Layers.BACKGROUND);
+        int startX, startY, endX, endY;
+        int height = background.getHeight() / background.getTileHeight();
+        int width = background.getWidth() / background.getTileWidth();
+
+        Random random = new Random();
+
+        switch (area) {
+            case TOP_LEFT:
+                startX = 1;
+                startY = height - height / 3;
+                endX = width / 3;
+                endY = height - 1;
+                break;
+            case TOP_RIGHT:
+                startX = width - width / 3;
+                startY = height - height / 3;
+                endX = width - 1;
+                endY = height - 1;
+                break;
+            case BOTTOM_LEFT:
+                startX = 1;
+                startY = 1;
+                endX = width / 3;
+                endY = height / 3;
+                break;
+            case BOTTOM_RIGHT:
+                startX = width - width / 3;
+                startY = 1;
+                endX = width;
+                endY = height / 3;
+                break;
+            case MIDDLE:
+                startX = width / 3;
+                startY = height / 3;
+                endX = 2 * width / 3;
+                endY = 2 * height / 3;
+                break;
+            default:
+                startX = 1;
+                startY = 1;
+                endX = width - 1;
+                endY = height - 1;
+                break;
+        }
+        for (int i = startX; i < endX; i++) {
+            for (int j = startY; j < endY; j++) {
+                // Find cells that are accessible
+                if (!mapManager.canMove(i,j) || mapManager.hasCop(i,j) || mapManager.hasItem(i,j)){
+                    continue;
+                }
+                cells.add(new Node(i, j));
             }
         }
 
-        return frontier;
+        Node pos = cells.get(random.nextInt(cells.size()));
+        charRect.x = pos.getX() * mapManager.getTileWidth();
+        charRect.y = pos.getY() * mapManager.getTileHeight();
     }
 
-    //connects cells which are distance 2 apart
-    private void connect(CellModel frontierCellModelView, CellModel neighbour) {
 
-        int inBetweenRow = (neighbour.getRow() + frontierCellModelView.getRow()) / 2;
-        int inBetweenCol = (neighbour.getColumn() + frontierCellModelView.getColumn()) / 2;
-        frontierCellModelView.setWall(false);
-        cells[inBetweenRow][inBetweenCol].setWall(false);
-        neighbour.setWall(false);
-    }
-
-    private boolean isValidPosition(int row, int col) {
-        return row >= 0 && row < cells.length
-                && col >= 0 && col < cells[0].length;
-    }
-
-    public LevelGenerator setDelay(long delay) {
-        this.delay = delay;
-        return this;
-    }
 }

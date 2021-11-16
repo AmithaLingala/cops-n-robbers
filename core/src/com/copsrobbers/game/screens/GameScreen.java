@@ -26,6 +26,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.copsrobbers.game.CopsAndRobbersV1;
+import com.copsrobbers.game.algorithm.CellModel;
+import com.copsrobbers.game.algorithm.LevelGenerator;
+import com.copsrobbers.game.listeners.GameListener;
 import com.copsrobbers.game.managers.GameManager;
 import com.copsrobbers.game.managers.MapManager;
 import com.copsrobbers.game.algorithm.Node;
@@ -49,7 +52,6 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private Robber robber;
-    private List<Cop> cops;
     private boolean isGameEnded = false;
     private Label coins;
     private Label level;
@@ -64,49 +66,27 @@ public class GameScreen implements Screen {
     }
 
     public void create() {
-        cops = new ArrayList<>();
-        TiledMap map = mapManager.generate(GameManager.getLevel());
+        int levelNumber = GameManager.getLevel();
+        CellModel[][] cells = new CellModel[mapManager.getRowTileCount()][mapManager.getColumnTileCount()];
+        LevelGenerator levelGen = new LevelGenerator(cells);
+        levelGen.generate(levelNumber);
+
+        TiledMap map = mapManager.generate(cells);
+
+        levelGen.generateCops(2, () -> {
+            isGameEnded = true;
+            game.setScreen(new EndScreen(game));
+        });
+
+        levelGen.generateItems(levelNumber);
+
+        robber = levelGen.generateRobber(() -> game.setScreen(new NextLevelScreen(game)));
+
         renderer = new OrthogonalTiledMapRenderer(map);
         camera = new OrthographicCamera();
         camera.setToOrtho(false, mapManager.getScreenWidth(), mapManager.getScreenHeight());
         camera.update();
-
         batch = new SpriteBatch();
-        Rectangle robberRect = new Rectangle();
-        setRandomPos(map, robberRect, AREA.MIDDLE);
-
-        robberRect.width = mapManager.getTileWidth();
-        robberRect.height = mapManager.getTileHeight();
-
-        robber = new Robber(robberRect, () -> game.setScreen(new NextLevelScreen(game)));
-
-        int copCount = 2;
-        for (int i = 0; i < copCount; i++) {
-            Rectangle copRect = new Rectangle();
-            setRandomPos(map, copRect, AREA.values()[i]);
-            copRect.width = mapManager.getTileWidth();
-            copRect.height = mapManager.getTileHeight();
-            Cop cop = new Cop(copRect, () -> {
-                isGameEnded = true;
-                game.setScreen(new EndScreen(game));
-
-            });
-            cops.add(cop);
-        }
-        Rectangle coinRect = new Rectangle();
-        setRandomPos(map, coinRect, AREA.BOTTOM_RIGHT);
-        coinRect.width = mapManager.getTileWidth();
-        coinRect.height = mapManager.getTileHeight();
-        Coin coin = new Coin(coinRect);
-        mapManager.addItem(coin);
-
-
-        Rectangle weaponRect = new Rectangle();
-        setRandomPos(map, weaponRect, AREA.BOTTOM_LEFT);
-        weaponRect.width = mapManager.getTileWidth();
-        weaponRect.height = mapManager.getTileHeight();
-        Weapon weapon = new Weapon(weaponRect);
-        mapManager.addItem(weapon);
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Amble-Light.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -148,67 +128,6 @@ public class GameScreen implements Screen {
 
     }
 
-    private void setRandomPos(TiledMap map, Rectangle charRect, AREA area) {
-        ArrayList<Node> cells = new ArrayList<>();
-
-        TiledMapTileLayer background = (TiledMapTileLayer) map.getLayers().get("background");
-        int startX, startY, endX, endY;
-        int height = background.getHeight() / background.getTileHeight();
-        int width = background.getWidth() / background.getTileWidth();
-
-        Random random = new Random();
-
-        switch (area) {
-            case TOP_LEFT:
-                startX = 1;
-                startY = height - height / 3;
-                endX = width / 3;
-                endY = height - 1;
-                break;
-            case TOP_RIGHT:
-                startX = width - width / 3;
-                startY = height - height / 3;
-                endX = width - 1;
-                endY = height - 1;
-                break;
-            case BOTTOM_LEFT:
-                startX = 1;
-                startY = 1;
-                endX = width / 3;
-                endY = height / 3;
-                break;
-            case BOTTOM_RIGHT:
-                startX = width - width / 3;
-                startY = 1;
-                endX = width;
-                endY = height / 3;
-                break;
-            case MIDDLE:
-                startX = width / 3;
-                startY = height / 3;
-                endX = 2 * width / 3;
-                endY = 2 * height / 3;
-                break;
-            default:
-                startX = 1;
-                startY = 1;
-                endX = width - 1;
-                endY = height - 1;
-                break;
-        }
-        for (int i = startX; i < endX; i++) {
-            for (int j = startY; j < endY; j++) {
-                Cell cell = background.getCell(i, j);
-                if (cell != null) {
-                    cells.add(new Node(i, j));
-                }
-            }
-        }
-
-        Node pos = cells.get(random.nextInt(cells.size()));
-        charRect.x = pos.getX() * mapManager.getTileWidth();
-        charRect.y = pos.getY() * mapManager.getTileHeight();
-    }
 
     private void updateCoins() {
         coins.setText("Coins: " + GameManager.getCoins());
@@ -233,7 +152,7 @@ public class GameScreen implements Screen {
             MOVES move = getMove();
             if (move != null) {
                 robber.update(move);
-                for (Cop cop : cops) {
+                for (Cop cop : mapManager.getCops()) {
                     cop.update(robber);
                 }
             }
@@ -252,7 +171,7 @@ public class GameScreen implements Screen {
 
         batch.begin();
         batch.draw(robber.getRegion(Gdx.graphics.getDeltaTime()), robber.getX(), robber.getY(), robber.getWidth(), robber.getHeight());
-        for (Cop cop : cops) {
+        for (Cop cop : mapManager.getCops()) {
             batch.draw(cop.getCharImg(), cop.getX(), cop.getY(), cop.getWidth(), cop.getHeight());
         }
         for (Item item : mapManager.getItems()) {
@@ -287,7 +206,7 @@ public class GameScreen implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 if (GameManager.getWeapons() > 0)
-                    robber.highlightTargets(stage, cops);
+                    robber.highlightTargets(stage, mapManager.getCops());
             }
 
             @Override
@@ -304,7 +223,7 @@ public class GameScreen implements Screen {
                 if (!isGameEnded) {
                     robber.update(MOVES.UP);
                     robber.setWalking(true);
-                    for (Cop cop : cops) {
+                    for (Cop cop : mapManager.getCops()) {
                         cop.update(robber);
                     }
 
@@ -316,7 +235,7 @@ public class GameScreen implements Screen {
                 if (!isGameEnded) {
                     robber.update(MOVES.RIGHT);
                     robber.setWalking(true);
-                    for (Cop cop : cops) {
+                    for (Cop cop : mapManager.getCops()) {
                         cop.update(robber);
                     }
                 }
@@ -327,7 +246,7 @@ public class GameScreen implements Screen {
                 if (!isGameEnded) {
                     robber.update(MOVES.LEFT);
                     robber.setWalking(true);
-                    for (Cop cop : cops) {
+                    for (Cop cop : mapManager.getCops()) {
                         cop.update(robber);
                     }
                 }
@@ -338,7 +257,7 @@ public class GameScreen implements Screen {
                 if (!isGameEnded) {
                     robber.update(MOVES.DOWN);
                     robber.setWalking(true);
-                    for (Cop cop : cops) {
+                    for (Cop cop : mapManager.getCops()) {
                         cop.update(robber);
                     }
                 }
