@@ -36,9 +36,10 @@ public class Cop extends Character {
     private LinkedList<Integer> catchRobber(Robber robber, LinkedList<LinkedList<Integer>> paths) {
         GraphManager G = new GraphManager();
         ArrayList<ArrayList<Integer>> adj = G.generateGraph();
+        int block = Math.min(4, paths.size());
         for (LinkedList<Integer> path : paths) {
-            for (Integer pos : path) {
-                adj.get(pos).clear();
+            for (int i = 1; i < block; i++) {
+                adj.get(path.get(i)).clear();
             }
         }
 
@@ -54,23 +55,25 @@ public class Cop extends Character {
     }
 
     public LinkedList<Integer> update(Robber robber, LinkedList<LinkedList<Integer>> paths) {
-        LinkedList<Integer> path = new LinkedList<>();
-        path.addAll(catchRobber(robber, paths));
-        if (!freeze && path.size() - 2 >= 0) {
-            int x = path.get(path.size() - 2) / this.getMapManager().getColumnTileCount();
-            int y = path.get(path.size() - 2) % this.getMapManager().getColumnTileCount();
-            x = x * this.getMapManager().getTileWidth();
-            y = y * this.getMapManager().getTileHeight();
-            if (x == robber.getX() && y == robber.getY()) {
+        LinkedList<Integer> path = new LinkedList<>(catchRobber(robber, paths));
+        if (!freeze) {
+            if (path.size() - 2 < 0) {
                 gl.endGame();
             } else {
-                this.setX(x);
-                this.setY(y);
+                int x = path.get(path.size() - 2) / this.getMapManager().getColumnTileCount();
+                int y = path.get(path.size() - 2) % this.getMapManager().getColumnTileCount();
+                x = x * this.getMapManager().getTileWidth();
+                y = y * this.getMapManager().getTileHeight();
+                if (x == robber.getX() && y == robber.getY()) {
+                    gl.endGame();
+                } else {
+                    this.setX(x);
+                    this.setY(y);
+                }
             }
         }
         unFreezeCop();
         return path;
     }
-
 
 }
