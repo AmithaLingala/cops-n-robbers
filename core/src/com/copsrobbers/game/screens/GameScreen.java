@@ -13,10 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -25,23 +22,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.copsrobbers.game.CopsAndRobbersV1;
+import com.copsrobbers.game.CopsAndRobbers;
 import com.copsrobbers.game.algorithm.CellModel;
 import com.copsrobbers.game.algorithm.LevelGenerator;
-import com.copsrobbers.game.listeners.GameListener;
 import com.copsrobbers.game.managers.GameManager;
 import com.copsrobbers.game.managers.MapManager;
-import com.copsrobbers.game.algorithm.Node;
 import com.copsrobbers.game.characters.Cop;
 import com.copsrobbers.game.characters.Robber;
-import com.copsrobbers.game.items.Coin;
 import com.copsrobbers.game.items.Item;
-import com.copsrobbers.game.items.Weapon;
 import com.copsrobbers.game.listeners.SimpleDirectionGestureDetector;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 public class GameScreen implements Screen {
 
@@ -60,7 +49,7 @@ public class GameScreen implements Screen {
 
     public GameScreen(Game game) {
         this.game = game;
-        mapManager = MapManager.initialize();
+        mapManager = MapManager.obtain();
         this.stage = new Stage(new FitViewport(mapManager.getScreenWidth(), mapManager.getScreenHeight()));
         create();
     }
@@ -80,7 +69,11 @@ public class GameScreen implements Screen {
 
         levelGen.generateItems(levelNumber);
 
-        robber = levelGen.generateRobber(() -> game.setScreen(new NextLevelScreen(game)));
+        levelGen.generateRobber(() -> {
+            isGameEnded = true;
+            game.setScreen(new NextLevelScreen(game));
+        });
+        robber = mapManager.getRobber();
 
         renderer = new OrthogonalTiledMapRenderer(map);
         camera = new OrthographicCamera();
@@ -111,7 +104,7 @@ public class GameScreen implements Screen {
         level.setY(mapManager.getScreenHeight() - mapManager.getTileHeight());
         stage.addActor(level);
 
-        weaponBtn = new ImageButton(CopsAndRobbersV1.gameSkin);
+        weaponBtn = new ImageButton(CopsAndRobbers.gameSkin);
         weaponBtn.setSize(mapManager.getTileWidth() * 2, mapManager.getTileHeight());
         Texture weaponTexture = new Texture("EMP.png");
         TextureRegion[] regions = TextureRegion.split(weaponTexture, mapManager.getTextureSize(), mapManager.getTextureSize())[0];

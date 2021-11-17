@@ -2,11 +2,11 @@ package com.copsrobbers.game.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.copsrobbers.game.CopsAndRobbersV1;
+import com.copsrobbers.game.CopsAndRobbers;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new CopsAndRobbersV1(), config);
+		new LwjglApplication(new CopsAndRobbers(), config);
 	}
 }

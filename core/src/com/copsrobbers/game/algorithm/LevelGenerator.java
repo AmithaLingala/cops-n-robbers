@@ -28,8 +28,8 @@ public class LevelGenerator {
     };
     private final CellModel[][] cells;
     private final Random random;
-    private long delay = 0;
-    private MapManager mapManager;
+    private final long delay = 0;
+    private final MapManager mapManager;
 
 
     public LevelGenerator(CellModel[][] cells) {
@@ -64,24 +64,24 @@ public class LevelGenerator {
         }
         Rectangle gate = new Rectangle();
         gate.x = 1;
-        gate.y = cells[0].length-1;
+        gate.y = cells[0].length - 1;
         cells[(int) gate.x][(int) gate.y].setWall(false);
         cells[(int) gate.x][(int) gate.y].setGate(true);
-
+        cells[(int) gate.x][(int) gate.y].setBox(false);
     }
 
-    public void generateItems(int level){
-        for(int i=0; i<level*2;i++){
+    public void generateItems(int level) {
+        for (int i = 0; i < level * 2; i++) {
             Rectangle coinRect = new Rectangle();
-            setRandomPos(coinRect, GameScreen.AREA.values()[i%5]);
+            setRandomPos(coinRect, GameScreen.AREA.values()[i % 5]);
             coinRect.width = mapManager.getTileWidth();
             coinRect.height = mapManager.getTileHeight();
             Coin coin = new Coin(coinRect);
             mapManager.addItem(coin);
         }
-        for(int i=0; i<level;i++){
+        for (int i = 0; i < level; i++) {
             Rectangle weaponRect = new Rectangle();
-            setRandomPos(weaponRect, GameScreen.AREA.values()[(i+2)%5]);
+            setRandomPos(weaponRect, GameScreen.AREA.values()[(i + 2) % 5]);
             weaponRect.width = mapManager.getTileWidth();
             weaponRect.height = mapManager.getTileHeight();
             Weapon weapon = new Weapon(weaponRect);
@@ -99,12 +99,13 @@ public class LevelGenerator {
             mapManager.addCop(cop);
         }
     }
-    public Robber generateRobber(LevelListener ll){
+
+    public void generateRobber(LevelListener ll) {
         Rectangle robberRect = new Rectangle();
         robberRect.width = mapManager.getTileWidth();
         robberRect.height = mapManager.getTileHeight();
         setRandomPos(robberRect, GameScreen.AREA.MIDDLE);
-        return new Robber(robberRect,ll);
+        mapManager.setRobber(new Robber(robberRect, ll));
     }
 
     private void setRandomPos(Rectangle charRect, GameScreen.AREA area) {
@@ -158,7 +159,7 @@ public class LevelGenerator {
         for (int i = startX; i < endX; i++) {
             for (int j = startY; j < endY; j++) {
                 // Find cells that are accessible
-                if (!mapManager.canMove(i,j) || mapManager.hasCop(i,j) || mapManager.hasItem(i,j)){
+                if (!mapManager.canMove(i, j) || mapManager.hasCop(i, j) || mapManager.hasItem(i, j)) {
                     continue;
                 }
                 cells.add(new Node(i, j));

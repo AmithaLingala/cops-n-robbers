@@ -3,10 +3,7 @@ package com.copsrobbers.game.screens;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -14,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.copsrobbers.game.CopsAndRobbersV1;
+import com.copsrobbers.game.CopsAndRobbers;
 import com.copsrobbers.game.managers.MapManager;
 import com.copsrobbers.game.ui.Components;
 
@@ -34,7 +31,7 @@ public class TitleScreen implements Screen {
         title.setY(mapManager.getScreenHeight() - 3 * mapManager.getTileHeight());
 
         stage.addActor(title);
-        TextButton playButton = new TextButton("Play!", CopsAndRobbersV1.gameSkin);
+        TextButton playButton = new TextButton("Play!", CopsAndRobbers.gameSkin);
         playButton.setWidth(Gdx.graphics.getWidth() * 0.5f);
         playButton.setHeight(Gdx.graphics.getHeight() / 10f);
         playButton.setPosition(Gdx.graphics.getWidth() * 0.5f - playButton.getWidth() * 0.5f, Gdx.graphics.getHeight() * 0.5f - playButton.getHeight() / 10f);

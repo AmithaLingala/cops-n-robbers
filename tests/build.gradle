@@ -1,0 +1,26 @@
+
+
+//apply plugin: "com.android.application"
+apply plugin: "java"
+
+//sourceCompatibility = 1.6
+//[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+
+
+sourceSets {
+	test {
+        java {
+            srcDir 'src'
+        }
+    }
+    
+    
+}
+
+eclipse.project {
+    name = appName + "-tests"
+}
+
+java.targetCompatibility = JavaVersion.VERSION_1_8
+java.sourceCompatibility = JavaVersion.VERSION_1_8

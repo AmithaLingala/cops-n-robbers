@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.copsrobbers.game.algorithm.CellModel;
 import com.copsrobbers.game.algorithm.LevelGenerator;
 import com.copsrobbers.game.characters.Cop;
+import com.copsrobbers.game.characters.Robber;
 import com.copsrobbers.game.items.Item;
 import com.copsrobbers.game.ui.TiledMapActor;
 
@@ -25,6 +26,7 @@ public class MapManager {
     private static MapManager instance;
     private final ArrayList<Item> items;
     private final List<Cop> cops;
+    private  Robber robber;
     private final int textureSize = 32;
     private final TiledMapTileSet tileSet;
     private TiledMap map;
@@ -38,16 +40,19 @@ public class MapManager {
     private int rowTileCount;
     private int columnTileCount;
 
-    public MapManager() {
+    public  MapManager(){
+        this(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+    }
+    public MapManager(int screenWidth, int screenHeight) {
         items = new ArrayList<>();
         cops = new ArrayList<>();
         int prefRows = 25; //TODO Provide a better scaling, may be floats would do the trick
-        int scale = Gdx.graphics.getWidth() / textureSize / prefRows;
+        int scale = screenWidth / textureSize / prefRows;
         if (scale == 0) {
             scale = 1;
         }
-        this.setScreenWidth(Gdx.graphics.getWidth() / scale);
-        this.setScreenHeight(Gdx.graphics.getHeight() / scale);
+        this.setScreenWidth(screenWidth / scale);
+        this.setScreenHeight(screenHeight / scale);
         this.setRowTileCount(getScreenWidth() / textureSize);
         this.setColumnTileCount(getScreenHeight() / textureSize);
 
@@ -69,8 +74,8 @@ public class MapManager {
         }
     }
 
-    public static MapManager initialize() {
-        MapManager.instance = new MapManager();
+    public static MapManager initialize(int width, int height) {
+        MapManager.instance = new MapManager(width, height);
         return MapManager.instance;
     }
 
@@ -231,25 +236,28 @@ public class MapManager {
     }
 
     public boolean canMove(int x, int y) {
+        if((x<0||x>getRowTileCount()||y<0||y>getColumnTileCount())){return false;}
         return !(hasWall(x, y) || hasObstacle(x, y));
     }
 
     public boolean hasCop(int x, int y) {
-        for (Cop cop: cops) {
-            if(cop.getX() == x*this.getTileWidth() && cop.getY() == y *this.getTileHeight()){
+        for (Cop cop : cops) {
+            if (cop.getX() == x * this.getTileWidth() && cop.getY() == y * this.getTileHeight()) {
                 return true;
             }
         }
         return false;
     }
+
     public boolean hasItem(int x, int y) {
-        for (Item item: items) {
-            if(item.getX() == x*this.getTileWidth() && item.getY() == y *this.getTileHeight()){
+        for (Item item : items) {
+            if (item.getX() == x * this.getTileWidth() && item.getY() == y * this.getTileHeight()) {
                 return true;
             }
         }
         return false;
     }
+
     public void addItem(Item item) {
         items.add(item);
     }
@@ -258,9 +266,20 @@ public class MapManager {
         return cops;
     }
 
-    public  void addCop(Cop cop){
+    public void addCop(Cop cop) {
         cops.add(cop);
     }
+
+
+    public Robber getRobber() {
+        return robber;
+    }
+
+    public void setRobber(Robber robber) {
+        this.robber = robber;
+    }
+
+
     public void highlightTile(CellModel tile, boolean highlight) {
         TiledMapTileLayer obstacle = getLayer(Layers.OBSTACLES);
         TiledMapTileLayer background = getLayer(Layers.BACKGROUND);

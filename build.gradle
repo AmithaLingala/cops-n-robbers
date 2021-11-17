@@ -9,7 +9,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.1'
+        classpath 'com.android.tools.build:gradle:7.0.3'
         
 
     }
@@ -103,5 +103,50 @@ project(":core") {
         api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
         api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
         
+    }
+}
+project(":tests") {
+    apply plugin: "java"
+   // apply plugin: 'com.android.application'
+
+   // sourceSets.tests.java.srcDir = ["src/"]
+    test {
+        project.ext.assetsDir = new File("../android/assets")
+        workingDir = project.ext.assetsDir
+    }
+
+    dependencies {
+
+        /**
+         * If you do have some classes to test in os specific code you may want to uncomment
+         * some of these lines.
+         *
+         * BUT: I recommend to create separate test sub projects for each platform. Trust me :)
+         *
+         */
+
+       // implementation project(":android")
+//        compile project(":html")
+      //  implementation project(":desktop")
+
+
+//        if(System.getProperty("os.name").toLowerCase().indexOf("mac") >= 0) {
+//        	compile project(":ios")
+//        }
+
+        implementation project(":core")
+
+        implementation "junit:junit:4.12"
+        implementation "org.mockito:mockito-all:1.9.5"
+
+        implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+
+        testImplementation 'junit:junit:4.12'
+        testImplementation "org.mockito:mockito-all:1.9.5"
+
+        testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        testImplementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+        testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }
 }
