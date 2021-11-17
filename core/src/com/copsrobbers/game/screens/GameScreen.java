@@ -32,6 +32,8 @@ import com.copsrobbers.game.characters.Robber;
 import com.copsrobbers.game.items.Item;
 import com.copsrobbers.game.listeners.SimpleDirectionGestureDetector;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class GameScreen implements Screen {
@@ -142,6 +144,9 @@ public class GameScreen implements Screen {
         if (isGameEnded) return;
         robber.setWalking(true);
         LinkedList<LinkedList<Integer>> paths = new LinkedList<>();
+        Collections.sort(mapManager.getCops(),(a,b)->
+                Integer.compare(a.getDist(), b.getDist())
+        );
         for (Cop cop : mapManager.getCops()) {
             paths.add(cop.update(robber, paths));
         }

@@ -14,6 +14,16 @@ public class Cop extends Character {
     private final GameListener gl;
     private boolean freeze = false;
 
+    public int getDist() {
+        return dist;
+    }
+
+    public void setDist(int dist) {
+        this.dist = dist;
+    }
+
+    private int dist =0;
+
     public Cop(Rectangle bounds, GameListener gl) {
         super(bounds);
         this.gl = gl;
@@ -36,9 +46,9 @@ public class Cop extends Character {
     private LinkedList<Integer> catchRobber(Robber robber, LinkedList<LinkedList<Integer>> paths) {
         GraphManager G = new GraphManager();
         ArrayList<ArrayList<Integer>> adj = G.generateGraph();
-        int block = Math.min(4, paths.size());
+        int block = Math.min(10, paths.size());
         for (LinkedList<Integer> path : paths) {
-            for (int i = 1; i < block; i++) {
+            for (int i = 0; i < path.size(); i++) {
                 adj.get(path.get(i)).clear();
             }
         }
@@ -69,6 +79,8 @@ public class Cop extends Character {
                 } else {
                     this.setX(x);
                     this.setY(y);
+                    this.dist = (int) Math.sqrt((Math.pow(robber.getX()- this.getX(),2) + Math.pow(robber.getY()- this.getY(),2)));
+
                 }
             }
         }
