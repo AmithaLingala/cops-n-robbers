@@ -16,6 +16,11 @@ public class GameManager {
         prefs.flush();
     }
 
+    public static int getMaxScore() {
+        Preferences prefs = Gdx.app.getPreferences(CopsAndRobbers.class.getName());
+        return prefs.getInteger("MaxScore", 0);
+    }
+
     public static void updateCoins(int score) {
         Preferences prefs = Gdx.app.getPreferences(CopsAndRobbers.class.getName());
         int curScore = GameManager.getCoins();

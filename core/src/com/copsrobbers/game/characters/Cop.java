@@ -64,28 +64,31 @@ public class Cop extends Character {
         return G.printShortestDistance(adj, copPos, robberPos);
     }
 
-    public LinkedList<Integer> update(Robber robber, LinkedList<LinkedList<Integer>> paths) {
-        LinkedList<Integer> path = new LinkedList<>(catchRobber(robber, paths));
-        if (!freeze) {
-            if (path.size() - 2 < 0) {
+    public LinkedList<Integer> update(Robber robber, LinkedList<LinkedList<Integer>> oldPaths) {
+        if(this.getX() == robber.getX() && this.getY() == robber.getY()) {
+            gl.endGame();
+            return new LinkedList<>();
+        }
+        LinkedList<Integer> path = new LinkedList<>(catchRobber(robber, oldPaths));
+        if(path.size()==0) {
+            path = new LinkedList<>(catchRobber(robber, new LinkedList<>()));
+        }
+        if (!freeze && path.size()-2 >= 0) {
+            int x = path.get(path.size() - 2) / this.getMapManager().getColumnTileCount();
+            int y = path.get(path.size() - 2) % this.getMapManager().getColumnTileCount();
+            x = x * this.getMapManager().getTileWidth();
+            y = y * this.getMapManager().getTileHeight();
+            if (x == robber.getX() && y == robber.getY()) {
                 gl.endGame();
             } else {
-                int x = path.get(path.size() - 2) / this.getMapManager().getColumnTileCount();
-                int y = path.get(path.size() - 2) % this.getMapManager().getColumnTileCount();
-                x = x * this.getMapManager().getTileWidth();
-                y = y * this.getMapManager().getTileHeight();
-                if (x == robber.getX() && y == robber.getY()) {
-                    gl.endGame();
-                } else {
-                    this.setX(x);
-                    this.setY(y);
-                    this.dist = (int) Math.sqrt((Math.pow(robber.getX()- this.getX(),2) + Math.pow(robber.getY()- this.getY(),2)));
-
-                }
+                this.setX(x);
+                this.setY(y);
+                double xPow = Math.pow(robber.getX()- this.getX(),2);
+                double yPow = Math.pow(robber.getY()- this.getY(),2);
+                this.setDist((int) Math.sqrt( xPow + yPow));
             }
         }
         unFreezeCop();
         return path;
     }
-
 }
