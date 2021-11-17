@@ -46,7 +46,7 @@ public class MapManager {
     public MapManager(int screenWidth, int screenHeight) {
         items = new ArrayList<>();
         cops = new ArrayList<>();
-        int prefRows = 25; //TODO Provide a better scaling, may be floats would do the trick
+        int prefRows = 20; //TODO Provide a better scaling, may be floats would do the trick
         int scale = screenWidth / textureSize / prefRows;
         if (scale == 0) {
             scale = 1;

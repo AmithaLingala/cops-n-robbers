@@ -62,8 +62,6 @@ public class GraphManager {
         LinkedList<Integer> path = new LinkedList<>();
 
         if (!BFS(adj, source, dest, v, pred, dist)) {
-            System.out.println("Given source and destination" +
-                    "are not connected");
             return path;
         }
 
@@ -75,12 +73,6 @@ public class GraphManager {
             path.add(pred[crawl]);
             crawl = pred[crawl];
         }
-
-        // Print distance
-        System.out.println("Shortest path length is: " + dist[dest]);
-
-        // Print path
-        System.out.println("Path is ::");
         return path;
     }
     private static boolean BFS(ArrayList<ArrayList<Integer>> adj, int src,
