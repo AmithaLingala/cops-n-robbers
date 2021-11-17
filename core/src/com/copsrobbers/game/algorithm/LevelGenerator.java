@@ -5,17 +5,13 @@ import com.badlogic.gdx.math.Rectangle;
 import com.copsrobbers.game.characters.Cop;
 import com.copsrobbers.game.characters.Robber;
 import com.copsrobbers.game.items.Coin;
-import com.copsrobbers.game.items.Item;
 import com.copsrobbers.game.items.Weapon;
 import com.copsrobbers.game.listeners.GameListener;
 import com.copsrobbers.game.listeners.LevelListener;
 import com.copsrobbers.game.managers.MapManager;
-import com.copsrobbers.game.screens.EndScreen;
 import com.copsrobbers.game.screens.GameScreen;
-import com.copsrobbers.game.screens.NextLevelScreen;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class LevelGenerator {
@@ -36,6 +32,7 @@ public class LevelGenerator {
         this.cells = cells;
         random = new Random();
         mapManager = MapManager.obtain();
+
     }
 
     public void generate(int level) {
@@ -48,9 +45,11 @@ public class LevelGenerator {
         }
 
         //Pick a random cell
+        int threshold = 5;
+        int prob = Math.min(level, threshold);
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[0].length; j++) {
-                boolean flag = random.nextInt(100) < level * 2;
+                boolean flag = random.nextInt(100) < prob * 2;
                 cells[i][j].setBox(flag);
             }
         }
@@ -71,7 +70,9 @@ public class LevelGenerator {
     }
 
     public void generateItems(int level) {
-        for (int i = 0; i < level * 2; i++) {
+        int threshold = 5;
+        int prob = Math.min(level, threshold);
+        for (int i = 0; i < prob * 2; i++) {
             Rectangle coinRect = new Rectangle();
             setRandomPos(coinRect, GameScreen.AREA.values()[i % 5]);
             coinRect.width = mapManager.getTileWidth();
@@ -79,7 +80,8 @@ public class LevelGenerator {
             Coin coin = new Coin(coinRect);
             mapManager.addItem(coin);
         }
-        for (int i = 0; i < level; i++) {
+        prob = random.nextInt(prob) + 1;
+        for (int i = 0; i < prob; i++) {
             Rectangle weaponRect = new Rectangle();
             setRandomPos(weaponRect, GameScreen.AREA.values()[(i + 2) % 5]);
             weaponRect.width = mapManager.getTileWidth();

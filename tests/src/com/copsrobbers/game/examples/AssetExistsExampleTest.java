@@ -37,6 +37,8 @@ import com.copsrobbers.game.managers.GameManager;
 import com.copsrobbers.game.managers.MapManager;
 import com.copsrobbers.game.screens.GameScreen;
 
+import java.util.LinkedList;
+
 @RunWith(GdxTestRunner.class)
 public class AssetExistsExampleTest {
 	@Before
@@ -84,7 +86,7 @@ public class AssetExistsExampleTest {
         Cop cop = MapManager.obtain().getCops().get(0);
         float x = cop.getX();
         float y = cop.getY();
-        cop.update(robber);
+        cop.update(robber,new LinkedList<LinkedList<Integer>>());
         float nx = cop.getX();
         float ny = cop.getY();
         Assert.assertFalse("Cop should move towards robber",(x==nx && y==ny));

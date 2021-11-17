@@ -1,21 +1,20 @@
 package com.copsrobbers.game.characters;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.copsrobbers.game.managers.AssetManager;
-import com.copsrobbers.game.managers.GameManager;
-import com.copsrobbers.game.managers.MapManager;
 import com.copsrobbers.game.algorithm.CellModel;
 import com.copsrobbers.game.items.Item;
 import com.copsrobbers.game.listeners.LevelListener;
-import com.copsrobbers.game.ui.TiledMapActor;
+import com.copsrobbers.game.managers.AssetManager;
+import com.copsrobbers.game.managers.GameManager;
+import com.copsrobbers.game.managers.MapManager;
 import com.copsrobbers.game.screens.GameScreen;
+import com.copsrobbers.game.ui.TiledMapActor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +23,7 @@ public class Robber extends Character {
     private final LevelListener ll;
     ArrayList<CellModel> neighbours;
     ArrayList<TiledMapActor> actors;
+
     public Robber(Rectangle bounds, LevelListener ll) {
         super(bounds);
         this.ll = ll;
@@ -65,19 +65,20 @@ public class Robber extends Character {
         int mapHeight = (int) getMapManager().getMapHeight();
         int x = (int) (this.getX() / getMapManager().getTileWidth());
         int y = (int) (this.getY() / getMapManager().getTileHeight());
+        int[][] dirs = {
+                {0, 1}, {1, 0},
+                {0, -1}, {-1, 0},
+                {1, 1}, {-1, -1},
+                {1, -1}, {-1, 1}
+        };
+        for (int[] dir : dirs) {
+            int tempX = x + dir[0];
+            int tempY = y + dir[1];
+            if (tempX >= 0 && tempX < mapWidth && tempY >= 0 && tempY < mapHeight) {
+                neighbours.add(new CellModel(tempX, tempY));
+            }
+        }
 
-        if (x + 1 < mapWidth) {
-            neighbours.add(new CellModel((x + 1), y));
-        }
-        if (x - 1 >= 0) {
-            neighbours.add(new CellModel((x - 1), y));
-        }
-        if (y + 1 < mapHeight) {
-            neighbours.add(new CellModel(x, y + 1));
-        }
-        if (y - 1 >= 0) {
-            neighbours.add(new CellModel(x, y - 1));
-        }
         for (CellModel cell : neighbours) {
             updateCellType(cell);
             getMapManager().highlightTile(cell, true);

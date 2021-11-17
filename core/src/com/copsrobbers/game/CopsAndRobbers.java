@@ -32,8 +32,8 @@ public class CopsAndRobbers extends Game {
             this.width = Gdx.graphics.getWidth();
             this.height = Gdx.graphics.getHeight();
         }
-        GameManager.reset();
         MapManager.initialize(width,height);
+        GameManager.reset();
         AssetManager.initialize();
         this.setScreen(new TitleScreen(this));
     }

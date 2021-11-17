@@ -1,16 +1,12 @@
 package com.copsrobbers.game.listeners;
 
 import com.badlogic.gdx.input.GestureDetector;
+import com.copsrobbers.game.screens.GameScreen;
 
 public class SimpleDirectionGestureDetector extends GestureDetector {
     public interface DirectionListener {
-        void onLeft();
+        void onDirChange(GameScreen.MOVES move);
 
-        void onRight();
-
-        void onUp();
-
-        void onDown();
     }
 
     public SimpleDirectionGestureDetector(DirectionListener directionListener) {
@@ -28,15 +24,15 @@ public class SimpleDirectionGestureDetector extends GestureDetector {
         public boolean fling(float velocityX, float velocityY, int button) {
             if(Math.abs(velocityX)>Math.abs(velocityY)){
                 if(velocityX>0){
-                    directionListener.onRight();
+                    directionListener.onDirChange(GameScreen.MOVES.RIGHT);
                 }else{
-                    directionListener.onLeft();
+                    directionListener.onDirChange(GameScreen.MOVES.LEFT);
                 }
             }else{
                 if(velocityY>0){
-                    directionListener.onDown();
+                    directionListener.onDirChange(GameScreen.MOVES.DOWN);
                 }else{
-                    directionListener.onUp();
+                    directionListener.onDirChange(GameScreen.MOVES.UP);
                 }
             }
             return true;

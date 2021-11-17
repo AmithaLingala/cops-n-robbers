@@ -32,6 +32,8 @@ import com.copsrobbers.game.characters.Robber;
 import com.copsrobbers.game.items.Item;
 import com.copsrobbers.game.listeners.SimpleDirectionGestureDetector;
 
+import java.util.LinkedList;
+
 public class GameScreen implements Screen {
 
     private final Game game;
@@ -50,6 +52,7 @@ public class GameScreen implements Screen {
     public GameScreen(Game game) {
         this.game = game;
         mapManager = MapManager.obtain();
+        mapManager.reset();
         this.stage = new Stage(new FitViewport(mapManager.getScreenWidth(), mapManager.getScreenHeight()));
         create();
     }
@@ -134,22 +137,25 @@ public class GameScreen implements Screen {
         level.setText("Level: " + GameManager.getLevel());
     }
 
+    private void updateCharacterPos(MOVES move) {
+        robber.update(move);
+        if (isGameEnded) return;
+        robber.setWalking(true);
+        LinkedList<LinkedList<Integer>> paths = new LinkedList<>();
+        for (Cop cop : mapManager.getCops()) {
+            paths.add(cop.update(robber, paths));
+        }
+    }
+
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
         updateCoins();
         updateWeaponCount();
         updateLevel();
-
-        if (!isGameEnded) {
-            MOVES move = getMove();
-            if (move != null) {
-                robber.update(move);
-                for (Cop cop : mapManager.getCops()) {
-                    cop.update(robber);
-                }
-            }
-
+        MOVES move = getMove();
+        if (move != null) {
+            updateCharacterPos(move);
         }
 
         renderer.setView(camera);
@@ -204,7 +210,6 @@ public class GameScreen implements Screen {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-
                 return true;
             }
         });
@@ -212,50 +217,9 @@ public class GameScreen implements Screen {
         SimpleDirectionGestureDetector directionGestureDetector = new SimpleDirectionGestureDetector(new SimpleDirectionGestureDetector.DirectionListener() {
 
             @Override
-            public void onUp() {
-                if (!isGameEnded) {
-                    robber.update(MOVES.UP);
-                    robber.setWalking(true);
-                    for (Cop cop : mapManager.getCops()) {
-                        cop.update(robber);
-                    }
-
-                }
+            public void onDirChange(MOVES move) {
+                updateCharacterPos(move);
             }
-
-            @Override
-            public void onRight() {
-                if (!isGameEnded) {
-                    robber.update(MOVES.RIGHT);
-                    robber.setWalking(true);
-                    for (Cop cop : mapManager.getCops()) {
-                        cop.update(robber);
-                    }
-                }
-            }
-
-            @Override
-            public void onLeft() {
-                if (!isGameEnded) {
-                    robber.update(MOVES.LEFT);
-                    robber.setWalking(true);
-                    for (Cop cop : mapManager.getCops()) {
-                        cop.update(robber);
-                    }
-                }
-            }
-
-            @Override
-            public void onDown() {
-                if (!isGameEnded) {
-                    robber.update(MOVES.DOWN);
-                    robber.setWalking(true);
-                    for (Cop cop : mapManager.getCops()) {
-                        cop.update(robber);
-                    }
-                }
-            }
-
         });
         InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(directionGestureDetector);

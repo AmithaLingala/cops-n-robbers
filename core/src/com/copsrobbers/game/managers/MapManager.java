@@ -348,6 +348,11 @@ public class MapManager {
         actor.addListener(cl);
         return actor;
     }
+    public void reset(){
+        instance.getCops().clear();
+        instance.getItems().clear();
+        instance.setRobber(null);
+    }
 
     public enum Layers {
         WALLS("walls"), BACKGROUND("background"), OBSTACLES("obstacles");
