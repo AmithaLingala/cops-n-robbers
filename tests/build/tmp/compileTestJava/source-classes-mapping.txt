@@ -1,7 +1,0 @@
-com/copsrobbers/game/examples/AssetExistsExampleTest.java
- com.copsrobbers.game.examples.AssetExistsExampleTest
- com.copsrobbers.game.examples.AssetExistsExampleTest$1
-com/copsrobbers/game/GdxTestRunner.java
- com.copsrobbers.game.GdxTestRunner
-com/copsrobbers/game/examples/UnitTestExample.java
- com.copsrobbers.game.examples.UnitTestExample
