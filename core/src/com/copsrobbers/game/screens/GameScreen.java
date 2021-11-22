@@ -67,18 +67,19 @@ public class GameScreen implements Screen {
 
         TiledMap map = mapManager.generate(cells);
 
-        levelGen.generateCops(2, () -> {
-            isGameEnded = true;
-            game.setScreen(new EndScreen(game));
-        });
-
-        levelGen.generateItems(levelNumber);
 
         levelGen.generateRobber(() -> {
             isGameEnded = true;
             game.setScreen(new NextLevelScreen(game));
         });
         robber = mapManager.getRobber();
+
+        levelGen.generateCops( () -> {
+            isGameEnded = true;
+            game.setScreen(new EndScreen(game));
+        });
+
+        levelGen.generateItems();
 
         renderer = new OrthogonalTiledMapRenderer(map);
         camera = new OrthographicCamera();
@@ -117,8 +118,8 @@ public class GameScreen implements Screen {
         weaponBtn.getStyle().imageUp = new TextureRegionDrawable(regions[0]);
         weaponBtn.getStyle().imageDown = new TextureRegionDrawable(regions[1]);
         weaponBtn.setPosition(mapManager.getScreenWidth() * 0.5f - mapManager.getTileWidth() * 0.5f, 0);
-
         stage.addActor(weaponBtn);
+
         weaponCount = new Label("" + GameManager.getWeapons(), labelStyle);
         weaponCount.setPosition(mapManager.getScreenWidth() * 0.5f + mapManager.getTileWidth(), mapManager.getTileHeight() * 0.40f);
         stage.addActor(weaponCount);

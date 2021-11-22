@@ -66,7 +66,7 @@ public class GameManager {
     }
     public static void reset() {
         setLevel(1);
-        setWeapons(0);
+        setWeapons(1);
         setCoins(0);
     }
 }

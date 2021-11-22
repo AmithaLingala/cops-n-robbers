@@ -74,9 +74,11 @@ public class Robber extends Character {
         for (int[] dir : dirs) {
             int tempX = x + dir[0];
             int tempY = y + dir[1];
-            if (tempX >= 0 && tempX < mapWidth && tempY >= 0 && tempY < mapHeight) {
-                neighbours.add(new CellModel(tempX, tempY));
-            }
+            //if (tempX >= 0 && tempX < mapWidth && tempY >= 0 && tempY < mapHeight) {
+                if(!getMapManager().hasWall(tempX,tempY)) {
+                    neighbours.add(new CellModel(tempX, tempY));
+                }
+
         }
 
         for (CellModel cell : neighbours) {

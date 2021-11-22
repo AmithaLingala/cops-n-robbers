@@ -81,7 +81,7 @@ public class AssetExistsExampleTest {
         lg.generate(0);
         MapManager.obtain().generate(cells);
         lg.generateRobber(()->{});
-        lg.generateCops(1, ()->{});
+        lg.generateCops(()->{});
         Robber robber = MapManager.obtain().getRobber();
         Cop cop = MapManager.obtain().getCops().get(0);
         float x = cop.getX();

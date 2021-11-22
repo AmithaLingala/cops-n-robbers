@@ -35,9 +35,11 @@ public class EndScreen implements Screen {
         table.setHeight(height);
         table.setPosition(table.getWidth()*0.5f,0);
 
-
         Label title = Components.createLabel("Game Over!", 24);
         title.setAlignment(Align.center);
+
+        Label lvl = Components.createLabel("Level "+GameManager.getLevel(), 24);
+        lvl.setAlignment(Align.center);
 
         Label highScore = Components.createLabel("High Score "+ GameManager.getMaxScore(), 20);
         highScore.setAlignment(Align.center);
@@ -79,6 +81,9 @@ public class EndScreen implements Screen {
                 .padTop(mapManager.getTileHeight())
                 .padBottom(mapManager.getTileHeight())
                 .expandX().fillX().center();
+        table.row().expandX().fillX();
+
+        table.add(lvl).padBottom(mapManager.getTileHeight()).fillX().expandX();
         table.row().expandX().fillX();
 
         table.add(highScore).padBottom(mapManager.getTileHeight()).fillX().expandX();

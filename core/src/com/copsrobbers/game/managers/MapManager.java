@@ -257,6 +257,15 @@ public class MapManager {
         }
         return false;
     }
+    public boolean hasRobber(int x, int y){
+        if(robber == null)
+            return false;
+        return (robber.getX() == x * this.getTileWidth() && robber.getY() == y * this.getTileHeight());
+
+    }
+    public boolean isOccupied(int x, int y){
+        return (!canMove(x, y) || hasCop(x, y) || hasItem(x, y) || hasRobber(x,y));
+    }
 
     public void addItem(Item item) {
         items.add(item);

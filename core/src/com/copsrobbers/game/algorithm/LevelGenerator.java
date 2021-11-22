@@ -26,6 +26,7 @@ public class LevelGenerator {
     private final Random random;
     private final long delay = 0;
     private final MapManager mapManager;
+    private int levelNumber = 1;
 
 
     public LevelGenerator(CellModel[][] cells) {
@@ -36,7 +37,7 @@ public class LevelGenerator {
     }
 
     public void generate(int level) {
-
+        this.levelNumber = level;
         /* Start with a grid full of cellModelViews in state wall (not a path). */
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[0].length; j++) {
@@ -69,9 +70,9 @@ public class LevelGenerator {
         cells[(int) gate.x][(int) gate.y].setBox(false);
     }
 
-    public void generateItems(int level) {
+    public void generateItems() {
         int threshold = 5;
-        int prob = Math.min(level, threshold);
+        int prob = Math.min(this.levelNumber, threshold);
         for (int i = 0; i < prob * 2; i++) {
             Rectangle coinRect = new Rectangle();
             setRandomPos(coinRect, GameScreen.AREA.values()[i % 5]);
@@ -91,14 +92,30 @@ public class LevelGenerator {
         }
     }
 
-    public void generateCops(int copCount, GameListener gl) {
+    public void generateCops( GameListener gl) {
+        int copCount = 2;
+        if(this.levelNumber >= 10){
+            copCount = 3;
+        }
+        Robber robber = mapManager.getRobber();
         for (int i = 0; i < copCount; i++) {
             Rectangle copRect = new Rectangle();
-            setRandomPos(copRect, GameScreen.AREA.values()[i]);
+//            if(levelNumber <= 5) {
+//                setRandomPos(copRect, GameScreen.AREA.values()[i]);
+//            }else{
+//                setRandomPos(copRect, GameScreen.AREA.values()[i+1]);
+//            }
+            int pos = (i + (levelNumber/6))%4;
+            setRandomPos(copRect,GameScreen.AREA.values()[pos]);
             copRect.width = mapManager.getTileWidth();
             copRect.height = mapManager.getTileHeight();
             Cop cop = new Cop(copRect, gl);
-            mapManager.addCop(cop);
+            if(cop.canReachRobber(robber)){
+                mapManager.addCop(cop);
+            }
+            else{
+                i--;
+            }
         }
     }
 
@@ -106,7 +123,13 @@ public class LevelGenerator {
         Rectangle robberRect = new Rectangle();
         robberRect.width = mapManager.getTileWidth();
         robberRect.height = mapManager.getTileHeight();
-        setRandomPos(robberRect, GameScreen.AREA.MIDDLE);
+        if(levelNumber<7){
+            setRandomPos(robberRect, GameScreen.AREA.MIDDLE);
+        }
+        else{
+            setRandomPos(robberRect, GameScreen.AREA.BOTTOM_RIGHT);
+        }
+
         mapManager.setRobber(new Robber(robberRect, ll));
     }
 
@@ -161,7 +184,7 @@ public class LevelGenerator {
         for (int i = startX; i < endX; i++) {
             for (int j = startY; j < endY; j++) {
                 // Find cells that are accessible
-                if (!mapManager.canMove(i, j) || mapManager.hasCop(i, j) || mapManager.hasItem(i, j)) {
+                if (mapManager.isOccupied(i,j)) {
                     continue;
                 }
                 cells.add(new Node(i, j));

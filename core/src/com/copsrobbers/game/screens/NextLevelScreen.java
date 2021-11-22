@@ -3,7 +3,6 @@ package com.copsrobbers.game.screens;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -13,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.copsrobbers.game.CopsAndRobbers;
 import com.copsrobbers.game.managers.AssetManager;
 import com.copsrobbers.game.managers.GameManager;
 import com.copsrobbers.game.managers.MapManager;
@@ -22,6 +20,7 @@ import com.copsrobbers.game.ui.Components;
 public class NextLevelScreen implements Screen {
     private final Stage stage;
     private final Game game;
+    private final int MAX_LEVEL = 10;
 
     public NextLevelScreen(Game aGame) {
         game = aGame;
@@ -31,15 +30,15 @@ public class NextLevelScreen implements Screen {
         int height = Gdx.graphics.getHeight();
 
         Table table = new Table();
-        table.setWidth(width*0.5f);
+        table.setWidth(width * 0.5f);
         table.setHeight(height);
-        table.setPosition(table.getWidth()*0.5f,0);
+        table.setPosition(table.getWidth() * 0.5f, 0);
 
 
         Label title = Components.createLabel("Level Completed!", 24);
         title.setAlignment(Align.center);
 
-        Label highScore = Components.createLabel("High Score "+ GameManager.getMaxScore(), 20);
+        Label highScore = Components.createLabel("High Score " + GameManager.getMaxScore(), 20);
         highScore.setAlignment(Align.center);
 
         Label coins = Components.createLabel("Current Score: " + GameManager.getCoins(), 22);
@@ -49,8 +48,9 @@ public class NextLevelScreen implements Screen {
         weapons.setAlignment(Align.center);
         weapons.setY(mapManager.getScreenHeight() - 4 * mapManager.getTileHeight());
 
-        int level = GameManager.getLevel()+1;
-        TextButton nextLevelButton = Components.createTextButton("Next Level "+level, new InputListener() {
+        int level = GameManager.getLevel() + 1;
+
+        TextButton nextLevelButton = Components.createTextButton("Next Level " + level, new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 GameManager.setLevel(level);
@@ -63,6 +63,22 @@ public class NextLevelScreen implements Screen {
             }
         });
 
+        TextButton homeButton = Components.createTextButton("Main Menu", new InputListener() {
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                GameManager.reset();
+                game.setScreen(new TitleScreen(game));
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
+
+        if (level > MAX_LEVEL) {
+            title.setText("Congratulations!");
+        }
         table.add(title)
                 .padTop(mapManager.getTileHeight())
                 .padBottom(mapManager.getTileHeight())
@@ -77,8 +93,11 @@ public class NextLevelScreen implements Screen {
 
         table.add(weapons).fillX().expandX();
         table.row().expandX().fillX();
-
-        table.add(nextLevelButton).padTop(mapManager.getTileHeight()).padBottom(mapManager.getTileHeight()).fillX().expandX();
+        if (level <= MAX_LEVEL) {
+            table.add(nextLevelButton).padTop(mapManager.getTileHeight()).padBottom(mapManager.getTileHeight()).fillX().expandX();
+        } else {
+            table.add(homeButton).padTop(mapManager.getTileHeight()).padBottom(mapManager.getTileHeight()).fillX().expandX();
+        }
         table.row().expandX().fillX();
 
         stage.addActor(table);

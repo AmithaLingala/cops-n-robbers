@@ -13,6 +13,14 @@ import java.util.LinkedList;
 public class Cop extends Character {
     private final GameListener gl;
     private boolean freeze = false;
+    private int dist = 0;
+
+    public Cop(Rectangle bounds, GameListener gl) {
+        super(bounds);
+        this.gl = gl;
+        Texture copImg = new Texture(Gdx.files.internal("cop_walk.png"));
+        setCharImg(copImg);
+    }
 
     public int getDist() {
         return dist;
@@ -20,15 +28,6 @@ public class Cop extends Character {
 
     public void setDist(int dist) {
         this.dist = dist;
-    }
-
-    private int dist =0;
-
-    public Cop(Rectangle bounds, GameListener gl) {
-        super(bounds);
-        this.gl = gl;
-        Texture copImg = new Texture(Gdx.files.internal("cop_walk.png"));
-        setCharImg(copImg);
     }
 
     public void freezeCop() {
@@ -41,6 +40,11 @@ public class Cop extends Character {
         this.freeze = false;
         Texture copImg = new Texture(Gdx.files.internal("cop_walk.png"));
         setCharImg(copImg);
+    }
+
+    public boolean canReachRobber(Robber robber) {
+        LinkedList<Integer> path = new LinkedList<>(catchRobber(robber, new LinkedList<>()));
+        return path.size() > 0;
     }
 
     private LinkedList<Integer> catchRobber(Robber robber, LinkedList<LinkedList<Integer>> paths) {
@@ -65,15 +69,24 @@ public class Cop extends Character {
     }
 
     public LinkedList<Integer> update(Robber robber, LinkedList<LinkedList<Integer>> oldPaths) {
-        if(this.getX() == robber.getX() && this.getY() == robber.getY()) {
+        LinkedList<Integer> path = new LinkedList<>();
+        if (freeze) {
+            unFreezeCop();
+            int x = (int) this.getX() / this.getMapManager().getTextureSize();
+            int y = (int) this.getY() / this.getMapManager().getTextureSize();
+            int curPos = (x * this.getMapManager().getColumnTileCount()) + y;
+            path.add(curPos);
+            return path;
+        }
+        if (this.getX() == robber.getX() && this.getY() == robber.getY()) {
             gl.endGame();
             return new LinkedList<>();
         }
-        LinkedList<Integer> path = new LinkedList<>(catchRobber(robber, oldPaths));
-        if(path.size()==0) {
+        path.addAll(catchRobber(robber, oldPaths));
+        if (path.size() == 0) {
             path = new LinkedList<>(catchRobber(robber, new LinkedList<>()));
         }
-        if (!freeze && path.size()-2 >= 0) {
+        if (path.size() - 2 >= 0) {
             int x = path.get(path.size() - 2) / this.getMapManager().getColumnTileCount();
             int y = path.get(path.size() - 2) % this.getMapManager().getColumnTileCount();
             x = x * this.getMapManager().getTileWidth();
@@ -83,12 +96,11 @@ public class Cop extends Character {
             } else {
                 this.setX(x);
                 this.setY(y);
-                double xPow = Math.pow(robber.getX()- this.getX(),2);
-                double yPow = Math.pow(robber.getY()- this.getY(),2);
-                this.setDist((int) Math.sqrt( xPow + yPow));
+                double xPow = Math.pow(robber.getX() - this.getX(), 2);
+                double yPow = Math.pow(robber.getY() - this.getY(), 2);
+                this.setDist((int) Math.sqrt(xPow + yPow));
             }
         }
-        unFreezeCop();
         return path;
     }
 }
