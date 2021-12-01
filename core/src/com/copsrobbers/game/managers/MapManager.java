@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.copsrobbers.game.algorithm.CellModel;
-import com.copsrobbers.game.algorithm.LevelGenerator;
+import com.copsrobbers.game.algorithm.Node;
 import com.copsrobbers.game.characters.Cop;
 import com.copsrobbers.game.characters.Robber;
 import com.copsrobbers.game.items.Item;
@@ -26,9 +26,9 @@ public class MapManager {
     private static MapManager instance;
     private final ArrayList<Item> items;
     private final List<Cop> cops;
-    private  Robber robber;
     private final int textureSize = 32;
     private final TiledMapTileSet tileSet;
+    private Robber robber;
     private TiledMap map;
     private int tileWidth;
     private int tileHeight;
@@ -40,9 +40,10 @@ public class MapManager {
     private int rowTileCount;
     private int columnTileCount;
 
-    public  MapManager(){
-        this(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+    public MapManager() {
+        this(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
+
     public MapManager(int screenWidth, int screenHeight) {
         items = new ArrayList<>();
         cops = new ArrayList<>();
@@ -236,7 +237,9 @@ public class MapManager {
     }
 
     public boolean canMove(int x, int y) {
-        if((x<0||x>getRowTileCount()||y<0||y>getColumnTileCount())){return false;}
+        if ((x < 0 || x > getRowTileCount() || y < 0 || y > getColumnTileCount())) {
+            return false;
+        }
         return !(hasWall(x, y) || hasObstacle(x, y));
     }
 
@@ -257,14 +260,16 @@ public class MapManager {
         }
         return false;
     }
-    public boolean hasRobber(int x, int y){
-        if(robber == null)
+
+    public boolean hasRobber(int x, int y) {
+        if (robber == null)
             return false;
         return (robber.getX() == x * this.getTileWidth() && robber.getY() == y * this.getTileHeight());
 
     }
-    public boolean isOccupied(int x, int y){
-        return (!canMove(x, y) || hasCop(x, y) || hasItem(x, y) || hasRobber(x,y));
+
+    public boolean isOccupied(int x, int y) {
+        return (!canMove(x, y) || hasCop(x, y) || hasItem(x, y) || hasRobber(x, y));
     }
 
     public void addItem(Item item) {
@@ -273,6 +278,19 @@ public class MapManager {
 
     public List<Cop> getCops() {
         return cops;
+    }
+
+    public Integer convertPosToIndex(float x, float y) {
+        int Ix = (int) (x / this.getTextureSize());
+        int Iy = (int) (y / this.getTextureSize());
+        return (Ix * this.getColumnTileCount()) + Iy;
+    }
+    public Node convertIndexToPos(int pos) {
+        int x = pos / this.getColumnTileCount();
+        int y = pos % this.getColumnTileCount();
+        x = x * this.getTileWidth();
+        y = y * this.getTileHeight();
+        return new Node(x,y);
     }
 
     public void addCop(Cop cop) {
@@ -357,7 +375,8 @@ public class MapManager {
         actor.addListener(cl);
         return actor;
     }
-    public void reset(){
+
+    public void reset() {
         instance.getCops().clear();
         instance.getItems().clear();
         instance.setRobber(null);

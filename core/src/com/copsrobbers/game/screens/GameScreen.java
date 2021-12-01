@@ -25,14 +25,13 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.copsrobbers.game.CopsAndRobbers;
 import com.copsrobbers.game.algorithm.CellModel;
 import com.copsrobbers.game.algorithm.LevelGenerator;
-import com.copsrobbers.game.managers.GameManager;
-import com.copsrobbers.game.managers.MapManager;
 import com.copsrobbers.game.characters.Cop;
 import com.copsrobbers.game.characters.Robber;
 import com.copsrobbers.game.items.Item;
 import com.copsrobbers.game.listeners.SimpleDirectionGestureDetector;
+import com.copsrobbers.game.managers.GameManager;
+import com.copsrobbers.game.managers.MapManager;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 
@@ -74,7 +73,7 @@ public class GameScreen implements Screen {
         });
         robber = mapManager.getRobber();
 
-        levelGen.generateCops( () -> {
+        levelGen.generateCops(() -> {
             isGameEnded = true;
             game.setScreen(new EndScreen(game));
         });
@@ -144,12 +143,22 @@ public class GameScreen implements Screen {
         robber.update(move);
         if (isGameEnded) return;
         robber.setWalking(true);
-        LinkedList<LinkedList<Integer>> paths = new LinkedList<>();
-        Collections.sort(mapManager.getCops(),(a,b)->
+        LinkedList<LinkedList<Integer>> ignoredPaths = new LinkedList<>();
+        LinkedList<Integer> copsPos = new LinkedList<>();
+
+        Collections.sort(mapManager.getCops(), (a, b) ->
                 Integer.compare(a.getDist(), b.getDist())
         );
+        // to avoid cops overlapping each other
         for (Cop cop : mapManager.getCops()) {
-            paths.add(cop.update(robber, paths));
+            copsPos.add(mapManager.convertPosToIndex(cop.getX(), cop.getY()));
+        }
+        ignoredPaths.add(copsPos);
+        for (Cop cop : mapManager.getCops()) {
+            // current cop position should not be ignored
+            ignoredPaths.get(0).remove(mapManager.convertPosToIndex(cop.getX(), cop.getY()));
+            ignoredPaths.add(cop.update(robber, ignoredPaths));
+            ignoredPaths.get(0).add(mapManager.convertPosToIndex(cop.getX(), cop.getY()));
         }
     }
 
