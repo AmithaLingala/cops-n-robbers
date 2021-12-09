@@ -6,8 +6,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.copsrobbers.game.characters.Robber;
 
 public abstract class Item extends Image {
-    private  float x;
-    private  float y;
+    private float x;
+    private float y;
+    private float width;
+    private float height;
+
+    public Item(Rectangle bounds) {
+        this.x = bounds.x;
+        this.y = bounds.y;
+        this.width = bounds.width;
+        this.height = bounds.height;
+
+
+    }
 
     public float getX() {
         return x;
@@ -41,26 +52,11 @@ public abstract class Item extends Image {
         this.height = height;
     }
 
-    private  float width;
-    private  float height;
-
-    public Item(Rectangle bounds)
-    {
-        this.x = bounds.x;
-        this.y = bounds.y;
-        this.width = bounds.width;
-        this.height = bounds.height;
-
+    public boolean isCollided(Robber robber) {
+        return robber.getX() == this.getX() && robber.getY() == this.getY();
 
     }
 
-    public boolean isCollided(Robber robber){
-        if(robber.getX()== this.getX() && robber.getY() == this.getY())
-            return true;
-        else
-            return false;
-
-    }
     public abstract void collect();
 
     @Override

@@ -3,7 +3,6 @@ package com.copsrobbers.game.screens;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -13,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.copsrobbers.game.CopsAndRobbers;
 import com.copsrobbers.game.managers.AssetManager;
 import com.copsrobbers.game.managers.GameManager;
 import com.copsrobbers.game.managers.MapManager;
@@ -31,17 +29,17 @@ public class EndScreen implements Screen {
         int height = Gdx.graphics.getHeight();
 
         Table table = new Table();
-        table.setWidth(width*0.5f);
+        table.setWidth(width * 0.5f);
         table.setHeight(height);
-        table.setPosition(table.getWidth()*0.5f,0);
+        table.setPosition(table.getWidth() * 0.5f, 0);
 
         Label title = Components.createLabel("Game Over!", 24);
         title.setAlignment(Align.center);
 
-        Label lvl = Components.createLabel("Level "+GameManager.getLevel(), 24);
+        Label lvl = Components.createLabel("Level " + GameManager.getLevel(), 24);
         lvl.setAlignment(Align.center);
 
-        Label highScore = Components.createLabel("High Score "+ GameManager.getMaxScore(), 20);
+        Label highScore = Components.createLabel("High Score " + GameManager.getMaxScore(), 20);
         highScore.setAlignment(Align.center);
 
         Label coins = Components.createLabel("Current Score: " + GameManager.getCoins(), 22);

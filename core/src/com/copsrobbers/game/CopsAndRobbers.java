@@ -13,13 +13,13 @@ public class CopsAndRobbers extends Game {
     private int width;
     private int height;
 
-    public CopsAndRobbers(){
+    public CopsAndRobbers() {
         super();
         this.width = 0;
         this.height = 0;
     }
 
-    public CopsAndRobbers(int width, int height){
+    public CopsAndRobbers(int width, int height) {
         super();
         this.width = width;
         this.height = height;
@@ -28,11 +28,11 @@ public class CopsAndRobbers extends Game {
     @Override
     public void create() {
         gameSkin = new Skin(Gdx.files.internal("skin/holo/Holo-dark-mdpi.json"));
-        if(width==0 && height== 0){
+        if (width == 0 && height == 0) {
             this.width = Gdx.graphics.getWidth();
             this.height = Gdx.graphics.getHeight();
         }
-        MapManager.initialize(width,height);
+        MapManager.initialize(width, height);
         GameManager.reset();
         AssetManager.initialize();
         this.setScreen(new TitleScreen(this));

@@ -92,9 +92,9 @@ public class LevelGenerator {
         }
     }
 
-    public void generateCops( GameListener gl) {
+    public void generateCops(GameListener gl) {
         int copCount = 2;
-        if(this.levelNumber >= 10){
+        if (this.levelNumber >= 10) {
             copCount = 3;
         }
         Robber robber = mapManager.getRobber();
@@ -105,15 +105,14 @@ public class LevelGenerator {
 //            }else{
 //                setRandomPos(copRect, GameScreen.AREA.values()[i+1]);
 //            }
-            int pos = (i + (levelNumber/6))%4;
-            setRandomPos(copRect,GameScreen.AREA.values()[pos]);
+            int pos = (i + (levelNumber / 6)) % 4;
+            setRandomPos(copRect, GameScreen.AREA.values()[pos]);
             copRect.width = mapManager.getTileWidth();
             copRect.height = mapManager.getTileHeight();
             Cop cop = new Cop(copRect, gl);
-            if(cop.canReachRobber(robber)){
+            if (cop.canReachRobber(robber)) {
                 mapManager.addCop(cop);
-            }
-            else{
+            } else {
                 i--;
             }
         }
@@ -123,10 +122,9 @@ public class LevelGenerator {
         Rectangle robberRect = new Rectangle();
         robberRect.width = mapManager.getTileWidth();
         robberRect.height = mapManager.getTileHeight();
-        if(levelNumber<7){
+        if (levelNumber < 7) {
             setRandomPos(robberRect, GameScreen.AREA.MIDDLE);
-        }
-        else{
+        } else {
             setRandomPos(robberRect, GameScreen.AREA.BOTTOM_RIGHT);
         }
 
@@ -136,7 +134,7 @@ public class LevelGenerator {
     private void setRandomPos(Rectangle charRect, GameScreen.AREA area) {
         ArrayList<Node> cells = new ArrayList<>();
 
-        TiledMapTileLayer background = (TiledMapTileLayer) mapManager.getLayer(MapManager.Layers.BACKGROUND);
+        TiledMapTileLayer background = mapManager.getLayer(MapManager.Layers.BACKGROUND);
         int startX, startY, endX, endY;
         int height = background.getHeight() / background.getTileHeight();
         int width = background.getWidth() / background.getTileWidth();
@@ -184,7 +182,7 @@ public class LevelGenerator {
         for (int i = startX; i < endX; i++) {
             for (int j = startY; j < endY; j++) {
                 // Find cells that are accessible
-                if (mapManager.isOccupied(i,j)) {
+                if (mapManager.isOccupied(i, j)) {
                     continue;
                 }
                 cells.add(new Node(i, j));

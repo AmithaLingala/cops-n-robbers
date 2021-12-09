@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.copsrobbers.game.algorithm.GraphManager;
 import com.copsrobbers.game.algorithm.Node;
 import com.copsrobbers.game.listeners.GameListener;
-import com.copsrobbers.game.managers.MapManager;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -58,7 +57,7 @@ public class Cop extends Character {
             }
         }
 
-        int copPos = this.getMapManager().convertPosToIndex(this.getX(),this.getY());
+        int copPos = this.getMapManager().convertPosToIndex(this.getX(), this.getY());
         int robberPos = this.getMapManager().convertPosToIndex(robber.getX(), robber.getY());
 
         return G.printShortestDistance(adj, copPos, robberPos);
@@ -68,7 +67,7 @@ public class Cop extends Character {
         LinkedList<Integer> path = new LinkedList<>();
         if (freeze) {
             unFreezeCop();
-            int curPos = this.getMapManager().convertPosToIndex(this.getX(),this.getY());
+            int curPos = this.getMapManager().convertPosToIndex(this.getX(), this.getY());
             path.add(curPos);
             return path;
         }

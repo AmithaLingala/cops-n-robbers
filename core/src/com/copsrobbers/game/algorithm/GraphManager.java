@@ -17,67 +17,8 @@ public class GraphManager {
         mapHeight = mapManager.getColumnTileCount();
     }
 
-    public ArrayList<ArrayList<Integer>> generateGraph() {
-        ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
-
-        for (int row = 0; row < mapWidth; row++) {
-            for (int col = 0; col < mapHeight; col++) {
-                int current = (row * mapHeight) + col;
-                graph.add(this.getNeighbours(current));
-            }
-
-        }
-        return graph;
-    }
-
-    private ArrayList<Integer> getNeighbours(Integer pos) {
-        ArrayList<Integer> neighbours = new ArrayList<>();
-            int x = pos/ mapHeight;
-            int y = pos% mapHeight;
-
-        if(x+1< mapWidth && mapManager.canMove(x+1,y)){
-            neighbours.add(((x + 1) * mapHeight) + y);
-        }
-        if(x-1>=0 && mapManager.canMove(x-1,y)){
-            neighbours.add((x - 1) * mapHeight + y);
-        }
-        if(y+1<mapHeight && mapManager.canMove(x,y+1)){
-            neighbours.add(x * mapHeight + y + 1);
-        }
-        if(y-1>=0 && mapManager.canMove(x,y-1)){
-            neighbours.add(x * mapHeight + (y - 1));
-        }
-        return neighbours;
-    }
-    public LinkedList<Integer> printShortestDistance(
-            ArrayList<ArrayList<Integer>> adj,
-            int source, int dest) {
-        // predecessor[i] array stores predecessor of
-        // i and distance array stores distance of i
-        // from s
-
-        int v = adj.size();
-        int[] pred = new int[v];
-        int[] dist = new int[v];
-        LinkedList<Integer> path = new LinkedList<>();
-
-        if (!BFS(adj, source, dest, v, pred, dist)) {
-            return path;
-        }
-
-        // LinkedList to store path
-
-        int crawl = dest;
-        path.add(crawl);
-        while (pred[crawl] != -1) {
-            path.add(pred[crawl]);
-            crawl = pred[crawl];
-        }
-        return path;
-    }
     private static boolean BFS(ArrayList<ArrayList<Integer>> adj, int src,
-                               int dest, int v, int[] pred, int[] dist)
-    {
+                               int dest, int v, int[] pred, int[] dist) {
         // a queue to maintain queue of vertices whose
         // adjacency list is to be scanned as per normal
         // BFS algorithm using LinkedList of Integer type
@@ -123,6 +64,66 @@ public class GraphManager {
         }
 
         return false;
+    }
+
+    public ArrayList<ArrayList<Integer>> generateGraph() {
+        ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
+
+        for (int row = 0; row < mapWidth; row++) {
+            for (int col = 0; col < mapHeight; col++) {
+                int current = (row * mapHeight) + col;
+                graph.add(this.getNeighbours(current));
+            }
+
+        }
+        return graph;
+    }
+
+    private ArrayList<Integer> getNeighbours(Integer pos) {
+        ArrayList<Integer> neighbours = new ArrayList<>();
+        int x = pos / mapHeight;
+        int y = pos % mapHeight;
+
+        if (x + 1 < mapWidth && mapManager.canMove(x + 1, y)) {
+            neighbours.add(((x + 1) * mapHeight) + y);
+        }
+        if (x - 1 >= 0 && mapManager.canMove(x - 1, y)) {
+            neighbours.add((x - 1) * mapHeight + y);
+        }
+        if (y + 1 < mapHeight && mapManager.canMove(x, y + 1)) {
+            neighbours.add(x * mapHeight + y + 1);
+        }
+        if (y - 1 >= 0 && mapManager.canMove(x, y - 1)) {
+            neighbours.add(x * mapHeight + (y - 1));
+        }
+        return neighbours;
+    }
+
+    public LinkedList<Integer> printShortestDistance(
+            ArrayList<ArrayList<Integer>> adj,
+            int source, int dest) {
+        // predecessor[i] array stores predecessor of
+        // i and distance array stores distance of i
+        // from s
+
+        int v = adj.size();
+        int[] pred = new int[v];
+        int[] dist = new int[v];
+        LinkedList<Integer> path = new LinkedList<>();
+
+        if (!BFS(adj, source, dest, v, pred, dist)) {
+            return path;
+        }
+
+        // LinkedList to store path
+
+        int crawl = dest;
+        path.add(crawl);
+        while (pred[crawl] != -1) {
+            path.add(pred[crawl]);
+            crawl = pred[crawl];
+        }
+        return path;
     }
 }
 

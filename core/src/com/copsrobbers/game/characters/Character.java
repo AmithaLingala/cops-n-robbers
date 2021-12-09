@@ -1,4 +1,5 @@
 package com.copsrobbers.game.characters;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -16,6 +17,15 @@ public class Character {
     private Animation<TextureRegion> walk;
     private float stateTime;
     private boolean isWalking = false;
+    private Texture charImg;
+
+    public Character(Rectangle bounds) {
+        this.x = bounds.x;
+        this.y = bounds.y;
+        this.width = bounds.width;
+        this.height = bounds.height;
+        mapManager = MapManager.obtain();
+    }
 
     public boolean isWalking() {
         return isWalking;
@@ -29,15 +39,16 @@ public class Character {
         walk = new Animation<>(0.10f, regions);
         walk.setPlayMode(Animation.PlayMode.LOOP);
     }
-    public TextureRegion getRegion(float stateTime){
-        if(isWalking()) {
+
+    public TextureRegion getRegion(float stateTime) {
+        if (isWalking()) {
             this.stateTime += stateTime;
             return walk.getKeyFrame(this.stateTime);
-        }
-        else{
+        } else {
             return walk.getKeyFrame(stateTime);
         }
     }
+
     public MapManager getMapManager() {
         return mapManager;
     }
@@ -53,8 +64,6 @@ public class Character {
     public void setCharImg(Texture charImg) {
         this.charImg = charImg;
     }
-
-    private Texture charImg;
 
     public float getX() {
         return x;
@@ -88,16 +97,7 @@ public class Character {
         this.height = height;
     }
 
-
-    public Character(Rectangle bounds)
-    {
-        this.x = bounds.x;
-        this.y = bounds.y;
-        this.width = bounds.width;
-        this.height = bounds.height;
-         mapManager = MapManager.obtain();
-    }
-    public void update(GameScreen.MOVES move){
+    public void update(GameScreen.MOVES move) {
 
         int i = (int) Math.floor(this.x / this.getMapManager().getTileWidth());
         int j = (int) Math.floor(this.y / this.getMapManager().getTileHeight());
@@ -127,8 +127,7 @@ public class Character {
         if (!canMove) {
             this.x = curX;
             this.y = curY;
-        }
-        else{
+        } else {
             this.x = (float) (Math.floor(this.x / this.getMapManager().getTileWidth()) * this.getMapManager().getTileWidth());
             this.y = (float) (Math.floor(this.y / this.getMapManager().getTileHeight()) * this.getMapManager().getTileHeight());
         }

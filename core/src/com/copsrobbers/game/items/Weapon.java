@@ -16,7 +16,7 @@ public class Weapon extends Item {
         Texture weaponTexture = new Texture("EMP.png");
         MapManager mapManager = MapManager.obtain();
         TextureRegion[] regions = TextureRegion.split(weaponTexture, mapManager.getTextureSize(), mapManager.getTextureSize())[0];
-        spin = new Animation<>(1/5f, regions);
+        spin = new Animation<>(1 / 5f, regions);
         spin.setPlayMode(Animation.PlayMode.LOOP);
         GameManager.updateWeapons(score);
     }
