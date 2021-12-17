@@ -19,6 +19,10 @@ import com.copsrobbers.game.managers.GameManager;
 import com.copsrobbers.game.managers.MapManager;
 import com.copsrobbers.game.ui.Components;
 
+/**
+ * Class to implement Title Screen
+ */
+
 public class TitleScreen implements Screen {
 
     private final Stage stage;

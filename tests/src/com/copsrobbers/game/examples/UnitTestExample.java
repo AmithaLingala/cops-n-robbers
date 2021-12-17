@@ -39,10 +39,4 @@ public class UnitTestExample {
 		new CopsAndRobbers(640,480);
 	}
 
-	@Test
-	public void oneEqualsOne() {
-		assertEquals(1, 1);
-	}
-
-
 }

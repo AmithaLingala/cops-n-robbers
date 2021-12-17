@@ -35,6 +35,9 @@ import com.copsrobbers.game.managers.MapManager;
 import java.util.Collections;
 import java.util.LinkedList;
 
+/**
+ * Class to implement Game Screen
+ */
 public class GameScreen implements Screen {
 
     private final Game game;
@@ -58,6 +61,9 @@ public class GameScreen implements Screen {
         create();
     }
 
+    /**
+     * Method to hook into the lifecycle of LibGDX, called only once during start of the game loop thread
+     */
     public void create() {
         int levelNumber = GameManager.getLevel();
         CellModel[][] cells = new CellModel[mapManager.getRowTileCount()][mapManager.getColumnTileCount()];
@@ -126,19 +132,31 @@ public class GameScreen implements Screen {
 
     }
 
-
+    /**
+     * Method to update collected coin on the game screen
+     */
     private void updateCoins() {
         coins.setText("Coins: " + GameManager.getCoins());
     }
 
+    /**
+     * Method to update collected weapons on the game screen
+     */
     private void updateWeaponCount() {
         weaponCount.setText("" + GameManager.getWeapons());
     }
 
+    /**
+     * Method to update level on the game screen
+     */
     private void updateLevel() {
         level.setText("Level: " + GameManager.getLevel());
     }
 
+    /**
+     * Method to update character position on the game screen
+     * @param move direction to move the character
+     */
     private void updateCharacterPos(MOVES move) {
         robber.update(move);
         if (isGameEnded) return;
@@ -162,6 +180,10 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Overridden LibGDX method to render game scenes to the screen, called every time the game screen needs to be rendered
+     * @param delta interval for the current frame
+     */
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
@@ -175,10 +197,6 @@ public class GameScreen implements Screen {
 
         renderer.setView(camera);
         renderer.render();
-
-//        Vector3 v3 = new Vector3();
-//        v3.set(robber.getX(),robber.getY(),0);
-//        camera.position.lerp(v3,0.25f);
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
@@ -198,6 +216,10 @@ public class GameScreen implements Screen {
 
     }
 
+    /**
+     * Method to get the movement of player by key press
+     * @return the move from players input
+     */
     private MOVES getMove() {
         MOVES move = null;
         if (Gdx.input.isKeyJustPressed(Keys.LEFT)) {
@@ -242,7 +264,11 @@ public class GameScreen implements Screen {
         Gdx.input.setInputProcessor(multiplexer);
     }
 
-
+    /**
+     * Overridden lifecycle method of LibGDX to resize the game, called every time the size of the game screen is changed
+     * @param width new width
+     * @param height new height
+     */
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height);
@@ -264,14 +290,23 @@ public class GameScreen implements Screen {
 
     }
 
+    /**
+     * Overridden lifecycle method of LibGDX to method clean up and free all resources, called when the game is being destroyed
+     */
     @Override
     public void dispose() {
         GameManager.reset();
         batch.dispose();
     }
 
-
+    /**
+     * Enumerator with the possible moves
+     */
     public enum MOVES {LEFT, RIGHT, UP, DOWN}
+
+    /**
+     * Enumerator with possible sub areas of map
+     */
 
     public enum AREA {BOTTOM_LEFT, TOP_RIGHT, TOP_LEFT, BOTTOM_RIGHT, MIDDLE}
 }

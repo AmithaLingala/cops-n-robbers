@@ -12,6 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Align;
 import com.copsrobbers.game.CopsAndRobbers;
 
+/**
+ * Class for UI components to utilise in game screens
+ */
 public class Components {
     public static Label createLabel(String text, int fontSize) {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Amble-Light.ttf"));

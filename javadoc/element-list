@@ -1,0 +1,10 @@
+android.annotation
+android.os
+com.copsrobbers.game
+com.copsrobbers.game.algorithm
+com.copsrobbers.game.characters
+com.copsrobbers.game.items
+com.copsrobbers.game.listeners
+com.copsrobbers.game.managers
+com.copsrobbers.game.screens
+com.copsrobbers.game.ui

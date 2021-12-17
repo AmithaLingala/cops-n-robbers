@@ -17,6 +17,9 @@ import com.copsrobbers.game.managers.GameManager;
 import com.copsrobbers.game.managers.MapManager;
 import com.copsrobbers.game.ui.Components;
 
+/**
+ * Class to implement next level screen
+ */
 public class NextLevelScreen implements Screen {
     private final Stage stage;
     private final Game game;

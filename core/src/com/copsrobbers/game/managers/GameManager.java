@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.copsrobbers.game.CopsAndRobbers;
 
+/**
+ * Class to manage game score, weapon count and level
+ */
 public class GameManager {
     public static int getCoins() {
         Preferences prefs = Gdx.app.getPreferences(CopsAndRobbers.class.getName());

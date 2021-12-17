@@ -1,20 +1,30 @@
 package com.copsrobbers.game.algorithm;
 
-import java.beans.PropertyChangeSupport;
-
+/**
+ * CellModel is a class to define the cell type and its position on the map.
+ */
 public class CellModel {
 
     private final int row, column;
     private boolean isWall;
-    //support to fire property change events
-    private PropertyChangeSupport pcs;
     private boolean isGate;
     private boolean isBox;
 
+    /**
+     * Constructor for the cell model without a cell type
+     * @param row row index
+     * @param column column index
+     */
     public CellModel(int row, int column) {
         this(row, column, false);
     }
 
+    /**
+     * Constructor for the cell model with cell type
+     * @param row row index
+     * @param column column index
+     * @param isWall cell type
+     */
     public CellModel(int row, int column, boolean isWall) {
         this.row = row;
         this.column = column;
@@ -26,16 +36,6 @@ public class CellModel {
         if (!(obj instanceof CellModel)) return false;
         CellModel other = (CellModel) obj;
         return row == other.getRow() && column == other.getColumn();
-    }
-
-    public void setPropertChangeSupport(PropertyChangeSupport pcs) {
-        this.pcs = pcs;
-    }
-
-    private void firePropertyChange(String name, Object oldValue, Object newValue) {
-        if (pcs != null) {
-            pcs.firePropertyChange(name, oldValue, newValue);
-        }
     }
 
     /**
@@ -50,9 +50,7 @@ public class CellModel {
      * Set {@link #isWall}
      */
     public void setWall(boolean isWall) {
-        Object old = this.isWall;
         this.isWall = isWall;
-        firePropertyChange("Wall", old, isWall);
     }
 
 
@@ -68,9 +66,7 @@ public class CellModel {
      * Set {@link #isBox}
      */
     public void setBox(boolean isBox) {
-        Object old = this.isBox;
         this.isBox = isBox;
-        firePropertyChange("Box", old, isBox);
     }
 
     /**
@@ -84,9 +80,7 @@ public class CellModel {
      * Set {@link #isGate}
      */
     public void setGate(boolean isGate) {
-        Object old = this.isGate;
         this.isGate = isGate;
-        firePropertyChange("Gate", old, isGate);
     }
 
     /**

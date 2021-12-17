@@ -51,6 +51,7 @@ public class AssetExistsExampleTest {
     public void teardown(){
 	    GameManager.reset();
     }
+
     @Test
     public void robberCanMove(){
         CellModel[][] cells = new CellModel[10][10];

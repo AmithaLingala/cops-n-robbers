@@ -22,6 +22,9 @@ import com.copsrobbers.game.ui.TiledMapActor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class to manage map related functionalities
+ */
 public class MapManager {
     private static MapManager instance;
     private final ArrayList<Item> items;
@@ -44,6 +47,11 @@ public class MapManager {
         this(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
+    /**
+     * Constructor
+     * @param screenWidth Device screen width
+     * @param screenHeight Device screen height
+     */
     public MapManager(int screenWidth, int screenHeight) {
         items = new ArrayList<>();
         cops = new ArrayList<>();
@@ -75,11 +83,21 @@ public class MapManager {
         }
     }
 
+    /**
+     * Method to create MapManager instance with given width and height
+     * @param width width of the screen
+     * @param height height of the screen
+     * @return returns MapManager instance with given width and height
+     */
     public static MapManager initialize(int width, int height) {
         MapManager.instance = new MapManager(width, height);
         return MapManager.instance;
     }
 
+    /**
+     * Method to obtain MapManager instance
+     * @return returns MapManager instance
+     */
     public static MapManager obtain() {
         return MapManager.instance;
     }
@@ -180,6 +198,11 @@ public class MapManager {
 
     }
 
+    /**
+     * Method to generate Tilemap from the given grid of cells
+     * @param cells cells grid with position and type
+     * @return Tilemap with given grid of cells
+     */
     public TiledMap generate(CellModel[][] cells) {
 
         TiledMap map = new TiledMap();
@@ -226,16 +249,34 @@ public class MapManager {
         return items;
     }
 
+    /**
+     * Method to check if there is wall in the given position
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return returns true if there is a wall else returns false
+     */
     public boolean hasWall(int x, int y) {
         TiledMapTileLayer walls = getLayer(Layers.WALLS);
         return walls.getCell(x, y) != null;
     }
 
+    /**
+     * Method to check if there is Obstacle in the given position
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return returns true if there is a Obstacle else returns false
+     */
     public boolean hasObstacle(int x, int y) {
         TiledMapTileLayer obstacles = getLayer(Layers.OBSTACLES);
         return obstacles.getCell(x, y) != null;
     }
 
+    /**
+     * Method to check if movement is available in a given position
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return returns true if cell is empty else returns false
+     */
     public boolean canMove(int x, int y) {
         if ((x < 0 || x > getRowTileCount() || y < 0 || y > getColumnTileCount())) {
             return false;
@@ -243,6 +284,12 @@ public class MapManager {
         return !(hasWall(x, y) || hasObstacle(x, y));
     }
 
+    /**
+     * Method to check if there is cop in the given position
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return returns true if there is a cop else returns false
+     */
     public boolean hasCop(int x, int y) {
         for (Cop cop : cops) {
             if (cop.getX() == x * this.getTileWidth() && cop.getY() == y * this.getTileHeight()) {
@@ -251,7 +298,12 @@ public class MapManager {
         }
         return false;
     }
-
+    /**
+     * Method to check if there is item in the given position
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return returns true if there is a item else returns false
+     */
     public boolean hasItem(int x, int y) {
         for (Item item : items) {
             if (item.getX() == x * this.getTileWidth() && item.getY() == y * this.getTileHeight()) {
@@ -260,18 +312,32 @@ public class MapManager {
         }
         return false;
     }
-
+    /**
+     * Method to check if there is robber in the given position
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return returns true if there is a robber else returns false
+     */
     public boolean hasRobber(int x, int y) {
         if (robber == null)
             return false;
         return (robber.getX() == x * this.getTileWidth() && robber.getY() == y * this.getTileHeight());
 
     }
-
+    /**
+     * Method to check if there cell is occupied
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return returns true if there is occupied else returns false
+     */
     public boolean isOccupied(int x, int y) {
         return (!canMove(x, y) || hasCop(x, y) || hasItem(x, y) || hasRobber(x, y));
     }
 
+    /**
+     * Method to add item to the items list
+     * @param item Item
+     */
     public void addItem(Item item) {
         items.add(item);
     }
@@ -280,11 +346,23 @@ public class MapManager {
         return cops;
     }
 
+    /**
+     * Method to convert given position to index of graph
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return index for the given position
+     */
     public Integer convertPosToIndex(float x, float y) {
         int Ix = (int) (x / this.getTextureSize());
         int Iy = (int) (y / this.getTextureSize());
         return (Ix * this.getColumnTileCount()) + Iy;
     }
+
+    /**
+     * Method to convert given index to position on map
+     * @param pos index of the graph
+     * @return position from the given index
+     */
     public Node convertIndexToPos(int pos) {
         int x = pos / this.getColumnTileCount();
         int y = pos % this.getColumnTileCount();
@@ -293,6 +371,10 @@ public class MapManager {
         return new Node(x,y);
     }
 
+    /**
+     * Method to add cop to the cops list
+     * @param cop Cop
+     */
     public void addCop(Cop cop) {
         cops.add(cop);
     }
@@ -306,6 +388,11 @@ public class MapManager {
         this.robber = robber;
     }
 
+    /**
+     * Method to highlight/unhighlight tile on the map
+     * @param tile tile to highlight/unhighlight
+     * @param highlight true to highlight and false to unhighlight
+     */
 
     public void highlightTile(CellModel tile, boolean highlight) {
         TiledMapTileLayer obstacle = getLayer(Layers.OBSTACLES);
@@ -320,6 +407,11 @@ public class MapManager {
         }
     }
 
+    /**
+     * Method to update Tile type
+     * @param tile tile to update type
+     * @param layer tile layer
+     */
     public void updateTileType(CellModel tile, Layers layer) {
         if (tile.isWall()) {
             return;
@@ -333,11 +425,24 @@ public class MapManager {
         newLayer.setCell(tile.getRow(), tile.getColumn(), cell);
     }
 
+    /**
+     * Method to get cell based on position and layer name
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param layerName layer name
+     * @return returns cell in given layer at given position
+     */
     public TiledMapTileLayer.Cell getCell(int x, int y, String layerName) {
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(layerName);
         return layer.getCell(x, y);
     }
 
+    /**
+     * Method to get cell based on position
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return returns cell in given position
+     */
     public TiledMapTileLayer.Cell getCell(int x, int y) {
         for (MapLayer layer : map.getLayers()) {
             TiledMapTileLayer tileLayer = (TiledMapTileLayer) layer;
@@ -348,14 +453,27 @@ public class MapManager {
         return null;
     }
 
+    /**
+     * Method to get map layer by layer name
+     * @param layerName layer name
+     * @return returns map layer
+     */
     public TiledMapTileLayer getLayer(String layerName) {
         return (TiledMapTileLayer) map.getLayers().get(layerName);
     }
-
+    /**
+     * Method to get tiled map layer by layer
+     * @param layer Layer
+     * @return returns map layer
+     */
     public TiledMapTileLayer getLayer(Layers layer) {
         return getLayer(layer.getType());
     }
-
+    /**
+     * Method to get tiled map layer by cell
+     * @param cell CellModel cell
+     * @return returns map layer
+     */
     public TiledMapTileLayer getLayer(CellModel cell) {
         if (cell.isWall()) {
             return getLayer(Layers.WALLS);

@@ -4,6 +4,9 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
+/**
+ * Class to implement 2D scene graph
+ */
 public class TiledMapActor extends Actor {
 
     private final TiledMap tiledMap;

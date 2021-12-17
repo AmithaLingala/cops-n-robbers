@@ -18,6 +18,9 @@ import com.copsrobbers.game.CopsAndRobbers;
 import com.copsrobbers.game.managers.MapManager;
 import com.copsrobbers.game.ui.Components;
 
+/**
+ * Class to implement Help Screen
+ */
 public class HelpScreen implements Screen {
     private final Stage stage;
     private final Game game;

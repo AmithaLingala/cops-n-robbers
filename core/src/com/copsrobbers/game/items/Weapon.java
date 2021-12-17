@@ -7,10 +7,18 @@ import com.badlogic.gdx.math.Rectangle;
 import com.copsrobbers.game.managers.GameManager;
 import com.copsrobbers.game.managers.MapManager;
 
+/**
+ * Class for the Weapon inherited from Item class
+ */
 public class Weapon extends Item {
     private final Animation<TextureRegion> spin;
     private float stateTime = 0;
 
+    /**
+     * Constructor
+     * @param bounds Rectangle for weapon position and size
+     * @param score Value of the weapon to add to weapon count
+     */
     public Weapon(Rectangle bounds, int score) {
         super(bounds);
         Texture weaponTexture = new Texture("EMP.png");

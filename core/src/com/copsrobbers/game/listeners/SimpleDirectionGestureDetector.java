@@ -3,6 +3,9 @@ package com.copsrobbers.game.listeners;
 import com.badlogic.gdx.input.GestureDetector;
 import com.copsrobbers.game.screens.GameScreen;
 
+/**
+ * Class for Gesture detection
+ */
 public class SimpleDirectionGestureDetector extends GestureDetector {
     public interface DirectionListener {
         void onDirChange(GameScreen.MOVES move);

@@ -7,6 +7,9 @@ import com.badlogic.gdx.math.Rectangle;
 import com.copsrobbers.game.managers.MapManager;
 import com.copsrobbers.game.screens.GameScreen;
 
+/**
+ * Class for the Characters of the game
+ */
 public class Character {
     private float x;
     private float y;
@@ -19,6 +22,10 @@ public class Character {
     private boolean isWalking = false;
     private Texture charImg;
 
+    /**
+     * Constructor
+     * @param bounds Rectangle for Character position and size.
+     */
     public Character(Rectangle bounds) {
         this.x = bounds.x;
         this.y = bounds.y;
@@ -97,6 +104,10 @@ public class Character {
         this.height = height;
     }
 
+    /**
+     * Method to update the character position on the map
+     * @param move direction to move the character
+     */
     public void update(GameScreen.MOVES move) {
 
         int i = (int) Math.floor(this.x / this.getMapManager().getTileWidth());

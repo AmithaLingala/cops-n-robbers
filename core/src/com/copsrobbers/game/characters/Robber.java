@@ -19,11 +19,19 @@ import com.copsrobbers.game.ui.TiledMapActor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class for the Robber inherited from Character class
+ */
 public class Robber extends Character {
     private final LevelListener ll;
     ArrayList<CellModel> neighbours;
     ArrayList<TiledMapActor> actors;
 
+    /**
+     * Constructor
+     * @param bounds Rectangle for cop position and size.
+     * @param ll Level Listener
+     */
     public Robber(Rectangle bounds, LevelListener ll) {
         super(bounds);
         this.ll = ll;
@@ -34,6 +42,10 @@ public class Robber extends Character {
         setWalk(regions);
     }
 
+    /**
+     * Overriden method to update robber's position
+     * @param move direction to move the character
+     */
     @Override
     public void update(GameScreen.MOVES move) {
         super.update(move);
@@ -52,6 +64,9 @@ public class Robber extends Character {
         tryEscape();
     }
 
+    /**
+     * Method to check if the robber can escape from the gate
+     */
     public void tryEscape() {
         Rectangle gate = getMapManager().getGate();
         if (gate.x == this.getX() && gate.y == this.getY()) {
@@ -59,6 +74,11 @@ public class Robber extends Character {
         }
     }
 
+    /**
+     * Method to implement weapon usage by highlighting cells around robber
+     * @param stage viewpoint of scene to update actors on UI
+     * @param cops Cops list to check if there is cop in the highlighted cells to freeze
+     */
     public void highlightTargets(Stage stage, List<Cop> cops) {
         clearTargets();
         int mapWidth = (int) getMapManager().getMapWidth();
@@ -104,6 +124,9 @@ public class Robber extends Character {
 
     }
 
+    /**
+     * Method to unhighlight the highlighted cells
+     */
     public void clearTargets() {
         for (CellModel cell : neighbours) {
             updateCellType(cell);
@@ -116,6 +139,10 @@ public class Robber extends Character {
         actors.clear();
     }
 
+    /**
+     * Method to update cell type
+     * @param cell cell to update the type
+     */
     private void updateCellType(CellModel cell) {
         int x = cell.getRow();
         int y = cell.getColumn();

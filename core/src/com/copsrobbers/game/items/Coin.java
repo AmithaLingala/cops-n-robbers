@@ -7,11 +7,19 @@ import com.badlogic.gdx.math.Rectangle;
 import com.copsrobbers.game.managers.GameManager;
 import com.copsrobbers.game.managers.MapManager;
 
+/**
+ * Class for the Coin inherited from Item class
+ */
 public class Coin extends Item {
     private final int count;
     private final Animation<TextureRegion> spin;
     private float stateTime = 0;
 
+    /**
+     * Constructor
+     * @param bounds Rectangle for coin position and size.
+     * @param count Value of the coin to add to game score.
+     */
     public Coin(Rectangle bounds, int count) {
         super(bounds);
         this.count = count;

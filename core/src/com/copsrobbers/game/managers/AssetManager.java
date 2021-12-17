@@ -3,6 +3,9 @@ package com.copsrobbers.game.managers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 
+/**
+ * Class to manage audios for the game
+ */
 public class AssetManager {
     private static AssetManager instance = null;
     private final Sound ominous;

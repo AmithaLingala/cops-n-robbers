@@ -5,12 +5,19 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.copsrobbers.game.characters.Robber;
 
+/**
+ * Class for the Items of the Game
+ */
 public abstract class Item extends Image {
     private float x;
     private float y;
     private float width;
     private float height;
 
+    /**
+     * Constructor
+     * @param bounds Rectangle for Item position and size.
+     */
     public Item(Rectangle bounds) {
         this.x = bounds.x;
         this.y = bounds.y;
@@ -52,6 +59,11 @@ public abstract class Item extends Image {
         this.height = height;
     }
 
+    /**
+     * Method for collision detection
+     * @param robber Robber
+     * @return returns true if collided else returns false
+     */
     public boolean isCollided(Robber robber) {
         return robber.getX() == this.getX() && robber.getY() == this.getY();
 

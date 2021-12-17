@@ -10,42 +10,40 @@ public class GraphManager {
     private final int mapHeight;
     private final MapManager mapManager;
 
-
+    /**
+     * Class to manage Graph functionalities
+     */
     public GraphManager() {
         mapManager = MapManager.obtain();
         mapWidth = mapManager.getRowTileCount();
         mapHeight = mapManager.getColumnTileCount();
     }
 
+    /**
+     * Breadth First Search Algorithm
+     * @param adj Graph as adjacency list
+     * @param src Source node
+     * @param dest Destination node
+     * @param v Number of vertices
+     * @param pred Predecessor array stores predecessor of vertex
+     * @param dist Distance array stores distance of i
+     * @return returns true if destination is found else returns false
+     */
     private static boolean BFS(ArrayList<ArrayList<Integer>> adj, int src,
                                int dest, int v, int[] pred, int[] dist) {
-        // a queue to maintain queue of vertices whose
-        // adjacency list is to be scanned as per normal
-        // BFS algorithm using LinkedList of Integer type
+
         LinkedList<Integer> queue = new LinkedList<>();
 
-        // boolean array visited[] which stores the
-        // information whether ith vertex is reached
-        // at least once in the Breadth first search
         boolean[] visited = new boolean[v];
-
-        // initially all vertices are unvisited
-        // so v[i] for all i is false
-        // and as no path is yet constructed
-        // dist[i] for all i set to infinity
         for (int i = 0; i < v; i++) {
             visited[i] = false;
             dist[i] = Integer.MAX_VALUE;
             pred[i] = -1;
         }
-
-        // now source is first to be visited and
-        // distance from source to itself should be 0
         visited[src] = true;
         dist[src] = 0;
         queue.add(src);
 
-        // bfs Algorithm
         while (!queue.isEmpty()) {
             int u = queue.remove();
             for (int i = 0; i < adj.get(u).size(); i++) {
@@ -54,9 +52,6 @@ public class GraphManager {
                     dist[adj.get(u).get(i)] = dist[u] + 1;
                     pred[adj.get(u).get(i)] = u;
                     queue.add(adj.get(u).get(i));
-
-                    // stopping condition (when we find
-                    // our destination)
                     if (adj.get(u).get(i) == dest)
                         return true;
                 }
@@ -66,6 +61,10 @@ public class GraphManager {
         return false;
     }
 
+    /**
+     * Generates graph as adjacency list
+     * @return returns graph
+     */
     public ArrayList<ArrayList<Integer>> generateGraph() {
         ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
 
@@ -78,6 +77,12 @@ public class GraphManager {
         }
         return graph;
     }
+
+    /**
+     * Method to get all neighbours of the given cell
+     * @param pos position of cell
+     * @return ArrayList of neighbours
+     */
 
     private ArrayList<Integer> getNeighbours(Integer pos) {
         ArrayList<Integer> neighbours = new ArrayList<>();
@@ -99,12 +104,17 @@ public class GraphManager {
         return neighbours;
     }
 
-    public LinkedList<Integer> printShortestDistance(
+    /**
+     * Method to find shortest distance from source to destination
+     * @param adj Graph as adjacency list
+     * @param source Source node
+     * @param dest Destination node
+     * @return shortest path from source to destination
+     */
+
+    public LinkedList<Integer> findShortestDistance(
             ArrayList<ArrayList<Integer>> adj,
             int source, int dest) {
-        // predecessor[i] array stores predecessor of
-        // i and distance array stores distance of i
-        // from s
 
         int v = adj.size();
         int[] pred = new int[v];
@@ -114,8 +124,6 @@ public class GraphManager {
         if (!BFS(adj, source, dest, v, pred, dist)) {
             return path;
         }
-
-        // LinkedList to store path
 
         int crawl = dest;
         path.add(crawl);

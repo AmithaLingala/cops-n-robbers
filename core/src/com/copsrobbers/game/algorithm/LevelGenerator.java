@@ -14,6 +14,9 @@ import com.copsrobbers.game.screens.GameScreen;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Class to generate game levels
+ */
 public class LevelGenerator {
 
     private static final int[][] DIRECTIONS = { //distance of 2 to each side
@@ -24,11 +27,13 @@ public class LevelGenerator {
     };
     private final CellModel[][] cells;
     private final Random random;
-    private final long delay = 0;
     private final MapManager mapManager;
     private int levelNumber = 1;
 
-
+    /**
+     * Constructor
+     * @param cells grid map of cells
+     */
     public LevelGenerator(CellModel[][] cells) {
         this.cells = cells;
         random = new Random();
@@ -36,16 +41,18 @@ public class LevelGenerator {
 
     }
 
+    /**
+     * Method to generate map with walls, obstacles and gate for a given level
+     * @param level level number to generate map
+     */
     public void generate(int level) {
         this.levelNumber = level;
-        /* Start with a grid full of cellModelViews in state wall (not a path). */
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[0].length; j++) {
                 cells[i][j] = new CellModel(i, j, false);
             }
         }
 
-        //Pick a random cell
         int threshold = 5;
         int prob = Math.min(level, threshold);
         for (int i = 0; i < cells.length; i++) {
@@ -70,6 +77,9 @@ public class LevelGenerator {
         cells[(int) gate.x][(int) gate.y].setBox(false);
     }
 
+    /**
+     * Method to generate Items on the map
+     */
     public void generateItems() {
         int threshold = 5;
         int prob = Math.min(this.levelNumber, threshold);
@@ -92,6 +102,10 @@ public class LevelGenerator {
         }
     }
 
+    /**
+     * Method to generate cops on the map
+     * @param gl game listener
+     */
     public void generateCops(GameListener gl) {
         int copCount = 2;
         if (this.levelNumber >= 10) {
@@ -100,11 +114,6 @@ public class LevelGenerator {
         Robber robber = mapManager.getRobber();
         for (int i = 0; i < copCount; i++) {
             Rectangle copRect = new Rectangle();
-//            if(levelNumber <= 5) {
-//                setRandomPos(copRect, GameScreen.AREA.values()[i]);
-//            }else{
-//                setRandomPos(copRect, GameScreen.AREA.values()[i+1]);
-//            }
             int pos = (i + (levelNumber / 6)) % 4;
             setRandomPos(copRect, GameScreen.AREA.values()[pos]);
             copRect.width = mapManager.getTileWidth();
@@ -118,6 +127,10 @@ public class LevelGenerator {
         }
     }
 
+    /**
+     * Method to generate robber on map
+     * @param ll Level listener
+     */
     public void generateRobber(LevelListener ll) {
         Rectangle robberRect = new Rectangle();
         robberRect.width = mapManager.getTileWidth();
@@ -131,7 +144,12 @@ public class LevelGenerator {
         mapManager.setRobber(new Robber(robberRect, ll));
     }
 
-    private void setRandomPos(Rectangle charRect, GameScreen.AREA area) {
+    /**
+     * Method to randomly pick position for objects on map in a given map partition
+     * @param objRect object to place on map
+     * @param area map area to pick a random position
+     */
+    private void setRandomPos(Rectangle objRect, GameScreen.AREA area) {
         ArrayList<Node> cells = new ArrayList<>();
 
         TiledMapTileLayer background = mapManager.getLayer(MapManager.Layers.BACKGROUND);
@@ -190,8 +208,8 @@ public class LevelGenerator {
         }
 
         Node pos = cells.get(random.nextInt(cells.size()));
-        charRect.x = pos.getX() * mapManager.getTileWidth();
-        charRect.y = pos.getY() * mapManager.getTileHeight();
+        objRect.x = pos.getX() * mapManager.getTileWidth();
+        objRect.y = pos.getY() * mapManager.getTileHeight();
     }
 
 
